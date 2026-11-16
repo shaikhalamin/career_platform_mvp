@@ -1,12 +1,16 @@
 import {
   HeadContent,
+  Link,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import { Compass } from 'lucide-react'
 import Footer from '../components/Footer'
 import Header from '../components/Header'
+import { EmptyState } from '../components/empty-state'
+import { Button } from '../components/ui/button'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import { ActiveProfileProvider } from '../lib/active-profile'
@@ -43,7 +47,25 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
   }),
   shellComponent: RootDocument,
+  notFoundComponent: NotFoundComponent,
 })
+
+function NotFoundComponent() {
+  return (
+    <main className="page-wrap flex flex-col items-center py-16">
+      <EmptyState
+        icon={Compass}
+        title="Page not found"
+        description="The page you're looking for doesn't exist or may have moved. Check the URL, or head back home to explore opportunities."
+        actions={
+          <Button asChild>
+            <Link to="/">Back to home</Link>
+          </Button>
+        }
+      />
+    </main>
+  )
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
@@ -52,7 +74,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <HeadContent />
       </head>
-      <body className="font-sans antialiased [overflow-wrap:anywhere]">
+      {/* suppressHydrationWarning: browser extensions (e.g. Grammarly)
+          inject attributes like data-gr-ext-installed onto <body> before
+          React hydrates; this only affects this element's attributes. */}
+      <body
+        className="font-sans antialiased [overflow-wrap:anywhere]"
+        suppressHydrationWarning
+      >
         <ActiveProfileProvider>
           <Header />
           {children}
