@@ -52,14 +52,20 @@ function FieldHint({ hint }: { hint: string }) {
   )
 }
 
-export function SubscribeButton({ label }: { label: string }) {
+export function SubscribeButton({
+  label,
+  disabled = false,
+}: {
+  label: string
+  disabled?: boolean
+}) {
   const form = useFormContext()
   return (
     <form.Subscribe selector={(state) => state.isSubmitting}>
       {(isSubmitting) => (
         <Button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || disabled}
           className="w-full sm:w-auto"
         >
           {label}

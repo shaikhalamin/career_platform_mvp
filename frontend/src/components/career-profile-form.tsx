@@ -166,7 +166,10 @@ export function CareerProfileForm({
           <div className="grid gap-5 sm:grid-cols-2">
             <form.AppField name="name">
               {(field) => (
-                <field.TextField label="Full name" placeholder="Your full name" />
+                <field.TextField
+                  label="Full name"
+                  placeholder="Your full name"
+                />
               )}
             </form.AppField>
             <form.AppField name="email">
@@ -308,7 +311,12 @@ export function CareerProfileForm({
 
         <div className="flex justify-end border-t border-[var(--divider)] pt-6">
           <form.AppForm>
-            <form.SubscribeButton label={submitLabel} />
+            <form.SubscribeButton
+              label={submitLabel}
+              // Not ready until the taxonomy lands: the sections are still
+              // disabled, so a click here would silently no-op.
+              disabled={taxonomyQuery.isPending}
+            />
           </form.AppForm>
         </div>
       </form>
