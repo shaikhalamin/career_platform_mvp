@@ -110,17 +110,12 @@ function HomePage() {
                 </Button>
               </>
             ) : (
-              <>
-                <Button asChild size="lg">
-                  <Link to="/profiles/new">
-                    Create a career profile
-                    <ArrowRight aria-hidden />
-                  </Link>
-                </Button>
-                <Button asChild size="lg" variant="outline">
-                  <Link to="/profiles">Use an existing profile</Link>
-                </Button>
-              </>
+              <Button asChild size="lg">
+                <Link to="/profiles/new">
+                  Create a career profile
+                  <ArrowRight aria-hidden />
+                </Link>
+              </Button>
             )}
           </div>
         </div>
