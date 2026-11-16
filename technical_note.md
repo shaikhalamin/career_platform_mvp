@@ -150,3 +150,32 @@ npm run gen:api                     # regenerate typed client (backend on :8000)
 - Recommendations computed live per request — no cache invalidation logic.
 - Centralized, validated configuration with startup-time safety checks
   (no wildcard CORS, DEBUG forbidden in production).
+
+## 9. Development approach & AI assistance
+
+How the project came together, and where AI tools fit into the process:
+
+- **Initial idea — ChatGPT.** The project concept (an international career
+  mobility platform: structured user profiles, a seeded opportunity catalog,
+  ranked and fully explained recommendations, a shortlist) was first explored
+  in a ChatGPT conversation — scoping the problem space, the core entities and
+  a realistic MVP feature set.
+- **Architecture & communication — my design.** The two-project monorepo
+  (FastAPI backend + TanStack Start frontend) and the way the projects
+  communicate are my own work: the OpenAPI-first contract, the Kubb-generated
+  typed client, the shared `ApiResponse` envelope and the Docker/uv/npm
+  toolchain per project.
+- **Matching score — AI-assisted setup.** The six-part weighted score
+  (§3: skills 35, experience 20, education 15, location 15, language 10,
+  interests 5) was set up with AI help — drafting the weights, the per-dimension
+  normalization ratios and the evidence each dimension returns — then pinned
+  down and verified by the pytest suite.
+- **Vector similarity — my initial thought.** From the start I wanted to go
+  beyond exact field matching and use a vector database to find semantically
+  similar data between a profile and job opportunities (e.g. "grant writing"
+  vs "donor reporting"). In the MVP this idea landed as the FAISS retrieval
+  stage: rule-generated feature vectors + cosine similarity narrow the catalog
+  to top-K candidates before scoring — dependency-light and deterministic, but
+  only as semantic as hand-built features allow. The natural next step is true
+  embeddings (e.g. sentence-transformers vectors in pgvector or a dedicated
+  vector DB) feeding the same retrieval interface.
