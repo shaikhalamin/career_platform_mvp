@@ -40,20 +40,29 @@ Includes dark/light/auto theming (persisted to `localStorage`, no flash on load)
 
 ## Workflow: how a page talks to the backend
 
-```mermaid
-flowchart LR
-    subgraph FE ["frontend (Vite dev server, port 3000)"]
-        R["src/routes/*.tsx<br/>pages (file-based routing)"]
-        H["src/hooks/ + src/lib/<br/>career form logic · active profile · error mapping"]
-        Q["src/gen/queries/<br/>TanStack Query hooks (Kubb)"]
-        A["src/gen/clients/<br/>axios functions (Kubb)"]
-        Z["src/gen/zod/<br/>zod schemas (Kubb)"]
-        R --> H --> Q --> A
-        Z -.->|"form validation"| H
-    end
-
-    A --|"HTTP JSON — ApiResponse envelope<br/>{success, data, message, meta}"| BE["FastAPI backend :8000<br/>/api/v1/*"]
-    BE -.->|"openapi.json"| K["kubb generate<br/>(npm run gen:api)"] -.->|"regenerates"| Q
+```
+┌─ frontend (Vite dev server, port 3000) ─────────────────────────┐
+│                                                                 │
+│  src/routes/*.tsx — pages (file-based routing)                  │
+│       │                                                         │
+│       ▼                                                         │
+│  src/hooks/ + src/lib/ — career form logic ·                    │
+│  active profile · error mapping                                 │
+│       │    ▲                                                    │
+│       │    ┆ form validation — src/gen/zod/                     │
+│       │    ┆ (zod schemas, Kubb-generated)                      │
+│       ▼                                                         │
+│  src/gen/queries/ — TanStack Query hooks (Kubb)                 │
+│       │                                                         │
+│       ▼                                                         │
+│  src/gen/clients/ — axios functions (Kubb)                      │
+│                                                                 │
+└────────────────┬────────────────────────────────────────────────┘
+                 │  HTTP JSON — ApiResponse envelope     ▲
+                 │  {success, data, message, meta}      ┆ openapi.json
+                 ▼                                      ┆ → kubb generate
+                                                        ┆   (npm run gen:api)
+   FastAPI backend :8000 — /api/v1/*                    ┆ → regenerates src/gen/
 ```
 
 Key points:

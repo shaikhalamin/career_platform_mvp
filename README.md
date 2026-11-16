@@ -24,23 +24,36 @@ Each project has its own README with full details:
 
 ## How the two projects work together
 
-```mermaid
-flowchart LR
-    subgraph Frontend["frontend/ (TanStack Start, port 3000)"]
-        UI["Profile form · Recommendations · Opportunities · Shortlist"]
-        GEN["src/gen/ — Kubb-generated<br/>typed client (axios + TanStack Query + zod)"]
-        UI --> GEN
-    end
-
-    subgraph Backend["backend/ (FastAPI, port 8000)"]
-        API["/api/v1 REST endpoints"]
-        PIPE["Recommendation pipeline<br/>1. FAISS cosine retrieval (top-K)<br/>2. Six-part weighted score<br/>3. Evidence-based eligibility"]
-        DB[("PostgreSQL 17<br/>profiles · opportunities · shortlist")]
-        API --> PIPE --> DB
-    end
-
-    GEN -- "HTTP JSON (ApiResponse envelope)" --> API
-    API -.->|"OpenAPI spec (kubb generate)"| GEN
+```
+┌─ frontend/ (TanStack Start, port 3000) ─────────────────────────┐
+│                                                                 │
+│  UI pages: profile form · recommendations · opportunities ·     │
+│            shortlist                                            │
+│       │                                                         │
+│       ▼                                                         │
+│  src/gen/ — Kubb-generated typed client                         │
+│  (axios + TanStack Query + zod)                                 │
+│                                                                 │
+└───────────────┬─────────────────────────────────────────────────┘
+                │  HTTP JSON (ApiResponse envelope)   ▲
+                │                                     ┆
+                │                                     ┆ OpenAPI spec
+                │                                     ┆ → kubb generate
+                ▼                                     ┆ → regenerates src/gen/
+┌─ backend/ (FastAPI, port 8000) ─────────────────────────────────┐
+│                                                                 │
+│  /api/v1 REST endpoints                                         │
+│       │                                                         │
+│       ▼                                                         │
+│  recommendation pipeline                                        │
+│    1. FAISS cosine retrieval (top-K)                            │
+│    2. six-part weighted score                                   │
+│    3. evidence-based eligibility                                │
+│       │                                                         │
+│       ▼                                                         │
+│  PostgreSQL 17 — profiles · opportunities · shortlist           │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 The frontend never hand-writes API calls: the backend's live OpenAPI document is

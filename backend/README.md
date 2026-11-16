@@ -38,25 +38,57 @@ contract for all responses.
 
 ## Request → recommendation workflow
 
-```mermaid
-flowchart TD
-    C["Client (frontend or curl)"] -->|"/api/v1/recommendations?profile_id=1&top_k=20"| R[profiles / opportunities / recommendations / shortlist routers]
-
-    subgraph services ["app/services — business logic"]
-        R --> PS[profile_service / opportunity_service / shortlist_service]
-        R --> REC[recommender — orchestration]
-        REC --> N["normalization — normalize profile + opportunities<br/>into comparable shapes"]
-        N --> V["vectors — rule-generated feature vectors"]
-        V --> RET["retrieval — FAISS cosine index (top-K candidates)"]
-        RET --> SC["scoring — six-part weighted score<br/>skills 35 · experience 20 · education 15<br/>location 15 · language 10 · interests 5"]
-        RET --> EL["eligibility — evidence-based check<br/>eligible / needs verification / ineligible"]
-        SC --> RK["ranking: eligibility tier → score → similarity"]
-        EL --> RK
-    end
-
-    PS --> DB[("PostgreSQL via SQLAlchemy async")]
-    R --> DB
-    RK --> ENV["ApiResponse envelope<br/>{success, data, message, meta}"] --> C
+```
+Client (frontend or curl)
+  │
+  │  GET /api/v1/recommendations?profile_id=1&top_k=20
+  ▼
+api/v1 routers — profiles · opportunities · recommendations · shortlist
+  │
+  ▼
+app/services — business logic
+  │
+  ├──▶ profile_service · opportunity_service · shortlist_service
+  │           │
+  │           ▼
+  │       PostgreSQL (via SQLAlchemy async)
+  │
+  └──▶ recommender — orchestration
+              │
+              ▼
+        normalization — normalize profile + opportunities
+        into comparable shapes
+              │
+              ▼
+        vectors — rule-generated feature vectors
+              │
+              ▼
+        retrieval — FAISS cosine index (top-K candidates)
+              │
+              ├────────────────────────────────┐
+              ▼                                ▼
+       ┌─ scoring ───────────────┐      ┌─ eligibility ───────────────┐
+       │ six-part weighted score │      │ evidence-based check        │
+       │ (100 points)            │      │  · eligible                 │
+       │  skills        35       │      │  · needs verification       │
+       │  experience    20       │      │  · ineligible               │
+       │  education     15       │      └───────┬──────────────────────┘
+       │  location      15       │              │
+       │  language      10       │              │
+       │  interests      5       │              │
+       └──────┬──────────────────┘              │
+              │                                 │
+              └────────────────┬────────────────┘
+                               ▼
+                   ranking — eligibility tier
+                   → score → similarity
+                               │
+                               ▼
+                   ApiResponse envelope
+                   {success, data, message, meta}
+                               │
+                               ▼
+                            Client
 ```
 
 Ranking rule: eligibility tier first (eligible → needs verification →
