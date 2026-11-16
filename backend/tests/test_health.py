@@ -1,0 +1,9 @@
+"""Health endpoint tests."""
+
+
+async def test_health_ok(client):
+    resp = await client.get("/api/v1/health")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["success"] is True
+    assert body["data"] == {"status": "ok", "database": "ok"}

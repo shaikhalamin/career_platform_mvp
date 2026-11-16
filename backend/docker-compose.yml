@@ -1,0 +1,27 @@
+name: career-platform-mvp
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: career_platform_mvp_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-career_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-career_password}
+      POSTGRES_DB: ${POSTGRES_DB:-career_platform_mvp}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      # Host 5435 so this MVP never collides with the old project's
+      # container (5434) or the system PostgreSQL service (5432).
+      - "${POSTGRES_PORT:-5435}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-career_user} -d ${POSTGRES_DB:-career_platform_mvp}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  postgres_data:

@@ -1,0 +1,42 @@
+# =============================================================================
+# Root .gitignore — covers both sub-projects (backend/ and frontend/).
+# Each sub-project also keeps its own .gitignore for tool-specific entries.
+# =============================================================================
+
+# --- Local agent/workspace artifacts ---
+.zcode/
+
+# --- Secrets / environment (templates: backend/.env.example) ---
+.env
+.env.*
+!.env.example
+
+# --- Python (backend) ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# --- Node (frontend) ---
+node_modules/
+dist/
+dist-ssr/
+*.local
+.nitro/
+.tanstack/
+.wrangler/
+.output/
+.vinxi/
+__unconfig*
+todos.json
+
+# --- Editors / OS ---
+.idea/
+.DS_Store
+*.swp
