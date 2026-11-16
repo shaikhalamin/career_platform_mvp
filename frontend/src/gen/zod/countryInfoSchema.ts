@@ -8,6 +8,7 @@ import * as z from 'zod'
 export const countryInfoSchema = z.object({
   name: z.string(),
   region: z.string(),
-}).describe('A country with its region.')
+  aliases: z.array(z.string()).optional().default([]).describe('Alternative names (lowercase) that also resolve to this country.'),
+}).describe('A country with its region and accepted alternative names.')
 
 export type CountryInfoSchemaType = z.infer<typeof countryInfoSchema>

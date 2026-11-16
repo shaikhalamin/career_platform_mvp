@@ -13,10 +13,14 @@ class RankedLevel(BaseModel):
 
 
 class CountryInfo(BaseModel):
-    """A country with its region."""
+    """A country with its region and accepted alternative names."""
 
     name: str
     region: str
+    aliases: list[str] = Field(
+        default=[],
+        description="Alternative names (lowercase) that also resolve to this country.",
+    )
 
 
 class TaxonomyRead(BaseModel):

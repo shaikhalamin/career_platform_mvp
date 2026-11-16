@@ -4,10 +4,16 @@
 */
 
 /**
- * @description A country with its region.
+ * @description A country with its region and accepted alternative names.
  * @type object
  */
 export type CountryInfo = {
   name: string;
   region: string;
+  /**
+   * @description Alternative names (lowercase) that also resolve to this country.
+   * @default []
+   * @type array | undefined
+   */
+  aliases?: string[];
 };

@@ -257,6 +257,7 @@ COUNTRY_REGIONS: dict[str, str] = {
     "Japan": "Asia-Pacific",
     "Australia": "Asia-Pacific",
     "India": "Asia-Pacific",
+    "Bangladesh": "Asia-Pacific",
     "United Arab Emirates": "Middle East",
     "Qatar": "Middle East",
 }
@@ -311,6 +312,7 @@ COUNTRY_ALIASES: dict[str, str] = {
     "japan": "Japan",
     "australia": "Australia",
     "india": "India",
+    "bangladesh": "Bangladesh",
     "uae": "United Arab Emirates",
     "u.a.e.": "United Arab Emirates",
     "emirates": "United Arab Emirates",

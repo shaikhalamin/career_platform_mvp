@@ -10,9 +10,9 @@ import {
 import { useAppForm } from '#/hooks/career.form'
 import { toFormErrors } from '#/lib/api-errors'
 import {
-  careerFormSchema,
   emptyFormValues,
   formValuesToApiPayload,
+  makeCareerFormSchema,
   taxonomyToOptions,
 } from '#/lib/career-form'
 import type { CareerFormValues, TaxonomyOptions } from '#/lib/career-form'
@@ -30,6 +30,7 @@ const EMPTY_OPTIONS: TaxonomyOptions = {
   languageLevels: [],
   languages: [],
   countries: [],
+  countryInputs: new Set<string>(),
   skills: [],
   tracks: [],
 }
@@ -86,6 +87,9 @@ export function CareerProfileForm({
   const options = taxonomyQuery.data?.data
     ? taxonomyToOptions(taxonomyQuery.data.data)
     : EMPTY_OPTIONS
+  // Bound to the taxonomy once it loads (TanStack Form refreshes validators
+  // on re-render), so unsupported country chips fail inline, not as a 422.
+  const careerFormSchema = makeCareerFormSchema(options.countryInputs)
 
   const form = useAppForm({
     defaultValues: initialValues ?? emptyFormValues(),

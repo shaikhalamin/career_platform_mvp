@@ -56,14 +56,19 @@ async def test_create_normalizes_loose_input(client):
     resp = await client.post(
         API,
         json=_payload(
-            preferred_locations=["USA", "U.K.", "singapore"],
+            preferred_locations=["USA", "U.K.", "singapore", "bangladesh"],
             languages={"english": "native"},
             work_authorisation={"CANADA": "authorized"},
         ),
     )
     assert resp.status_code == 201
     data = resp.json()["data"]
-    assert data["preferred_locations"] == ["United States", "United Kingdom", "Singapore"]
+    assert data["preferred_locations"] == [
+        "United States",
+        "United Kingdom",
+        "Singapore",
+        "Bangladesh",
+    ]
     assert data["languages"] == {"English": "native"}
     assert data["work_authorisation"] == {"Canada": "authorized"}
 

@@ -64,6 +64,14 @@ def taxonomy_summary() -> dict:
     """The reference taxonomy payload for `GET /meta/taxonomy`."""
     from app.schemas.taxonomy import CountryInfo, RankedLevel, TaxonomyRead
 
+    # Invert COUNTRY_ALIASES into country -> true alternative names (the
+    # lowercase canonical name itself is not a distinct alias), so clients
+    # can validate input against exactly what the backend accepts.
+    country_aliases: dict[str, list[str]] = {}
+    for alias, canonical in taxonomy.COUNTRY_ALIASES.items():
+        if alias != canonical.lower():
+            country_aliases.setdefault(canonical, []).append(alias)
+
     return TaxonomyRead(
         degree_levels=[
             RankedLevel(value=level, label=taxonomy.DEGREE_LEVEL_LABELS[level], rank=rank)
@@ -77,7 +85,7 @@ def taxonomy_summary() -> dict:
         skills=list(taxonomy.SKILLS),
         fields=list(taxonomy.FIELDS),
         countries=[
-            CountryInfo(name=name, region=region)
+            CountryInfo(name=name, region=region, aliases=country_aliases.get(name, []))
             for name, region in taxonomy.COUNTRY_REGIONS.items()
         ],
         career_tracks=list(taxonomy.TRACKS),

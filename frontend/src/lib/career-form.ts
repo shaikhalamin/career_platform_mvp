@@ -27,45 +27,55 @@ export interface CareerFormValues {
   currently_enrolled: boolean | null
 }
 
-export const careerFormSchema = z
-  .object({
-    name: z.string().trim().min(1, 'Name must not be blank.').max(100),
-    email: z.email('Enter a valid email address.').max(320),
-    education_level: z.enum([
-      'none',
-      'secondary',
-      'diploma',
-      'associate',
-      'bachelors',
-      'masters',
-      'doctorate',
-    ]),
-    education_field: z.string().max(120),
-    experience_years: z.number().min(0).max(50),
-    experience_areas: z.array(z.string()).max(10),
-    skills: z.array(z.string().trim().min(1)).min(1, 'Add at least one skill.'),
-    languages: z
-      .array(
-        z.object({
-          name: z.string().min(1, 'Pick a language.'),
-          level: z.string().min(1, 'Pick a proficiency.'),
-        }),
-      )
-      .min(1, 'Add at least one language.'),
-    preferred_locations: z
-      .array(z.string().trim().min(1))
-      .min(1, 'Add at least one preferred country.'),
-    career_interests: z.array(z.string().trim().min(1)).max(15),
-    work_authorisation: z.array(
+const careerFormBaseSchema = z.object({
+  name: z.string().trim().min(1, 'Name must not be blank.').max(100),
+  email: z.email('Enter a valid email address.').max(320),
+  education_level: z.enum([
+    'none',
+    'secondary',
+    'diploma',
+    'associate',
+    'bachelors',
+    'masters',
+    'doctorate',
+  ]),
+  education_field: z.string().max(120),
+  experience_years: z.number().min(0).max(50),
+  experience_areas: z.array(z.string()).max(10),
+  skills: z.array(z.string().trim().min(1)).min(1, 'Add at least one skill.'),
+  languages: z
+    .array(
       z.object({
-        country: z.string().min(1, 'Pick a country.'),
-        status: z.enum(['authorized', 'not_authorized', 'unknown']),
+        name: z.string().min(1, 'Pick a language.'),
+        level: z.string().min(1, 'Pick a proficiency.'),
       }),
-    ),
-    citizenship: z.string().max(80),
-    currently_enrolled: z.boolean().nullable(),
-  })
-  .superRefine((values, ctx) => {
+    )
+    .min(1, 'Add at least one language.'),
+  preferred_locations: z
+    .array(z.string().trim().min(1))
+    .min(1, 'Add at least one preferred country.'),
+  career_interests: z.array(z.string().trim().min(1)).max(15),
+  work_authorisation: z.array(
+    z.object({
+      country: z.string().min(1, 'Pick a country.'),
+      status: z.enum(['authorized', 'not_authorized', 'unknown']),
+    }),
+  ),
+  citizenship: z.string().max(80),
+  currently_enrolled: z.boolean().nullable(),
+})
+
+/**
+ * Builds the form schema bound to the loaded taxonomy. `countryInputs` is the
+ * lowercased set of country names + aliases the backend resolves; preferred
+ * countries are checked against it so unknown chips fail inline instead of as
+ * a backend 422 on save. An empty set (taxonomy still loading) skips the
+ * check — the backend re-validates regardless.
+ */
+export function makeCareerFormSchema(
+  countryInputs: ReadonlySet<string> = new Set(),
+) {
+  return careerFormBaseSchema.superRefine((values, ctx) => {
     const duplicateCountry = values.work_authorisation.find(
       (row, index) =>
         values.work_authorisation.findIndex(
@@ -79,7 +89,17 @@ export const careerFormSchema = z
         message: `Duplicate country: ${duplicateCountry.country}.`,
       })
     }
+    for (const country of values.preferred_locations) {
+      if (!countryInputs.has(country.trim().toLowerCase())) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['preferred_locations'],
+          message: `"${country}" is not a supported country — pick one from the suggestions or use a known alias (e.g. UK, USA).`,
+        })
+      }
+    }
   })
+}
 
 export function emptyFormValues(): CareerFormValues {
   return {
@@ -160,11 +180,20 @@ export interface TaxonomyOptions {
   languageLevels: { label: string; value: string }[]
   languages: string[]
   countries: string[]
+  /** Lowercased names + aliases the backend resolves (validation set). */
+  countryInputs: ReadonlySet<string>
   skills: string[]
   tracks: string[]
 }
 
 export function taxonomyToOptions(taxonomy: TaxonomyRead): TaxonomyOptions {
+  const countryInputs = new Set<string>()
+  for (const country of taxonomy.countries) {
+    countryInputs.add(country.name.toLowerCase())
+    for (const alias of country.aliases ?? []) {
+      countryInputs.add(alias.toLowerCase())
+    }
+  }
   return {
     degreeLevels: taxonomy.degree_levels.map((level) => ({
       value: level.value,
@@ -175,6 +204,7 @@ export function taxonomyToOptions(taxonomy: TaxonomyRead): TaxonomyOptions {
       .map((level) => ({ value: level.value, label: level.label })),
     languages: taxonomy.languages,
     countries: taxonomy.countries.map((country) => country.name),
+    countryInputs,
     skills: taxonomy.skills,
     tracks: taxonomy.career_tracks,
   }
