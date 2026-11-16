@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useStore } from '@tanstack/react-form'
-import { X } from 'lucide-react'
+import { CircleAlert, X } from 'lucide-react'
 
 import { useFieldContext, useFormContext } from '#/hooks/form-contexts'
 
@@ -32,12 +32,21 @@ function FieldErrors() {
         errors.map((error) => (
           <div
             key={typeof error === 'string' ? error : error.message}
-            className="mt-1 text-sm font-semibold text-red-600"
+            className="mt-1.5 flex items-start gap-1.5 text-xs font-medium text-[var(--error)]"
           >
+            <CircleAlert aria-hidden className="mt-0.5 size-3.5 shrink-0" />
             {typeof error === 'string' ? error : error.message}
           </div>
         ))}
     </>
+  )
+}
+
+function FieldHint({ hint }: { hint: string }) {
+  return (
+    <p className="mt-1.5 text-xs leading-relaxed text-[var(--ink-tertiary)]">
+      {hint}
+    </p>
   )
 }
 
@@ -46,7 +55,11 @@ export function SubscribeButton({ label }: { label: string }) {
   return (
     <form.Subscribe selector={(state) => state.isSubmitting}>
       {(isSubmitting) => (
-        <Button type="submit" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full sm:w-auto"
+        >
           {label}
         </Button>
       )}
@@ -68,7 +81,7 @@ export function TextField({
     <div>
       <Label
         htmlFor={label}
-        className="mb-2 text-sm font-semibold text-[var(--ink)]"
+        className="mb-2 text-sm font-medium text-[var(--ink)]"
       >
         {label}
       </Label>
@@ -79,9 +92,7 @@ export function TextField({
         onBlur={field.handleBlur}
         onChange={(e) => field.handleChange(e.target.value)}
       />
-      {hint && (
-        <p className="mt-1 text-xs text-[var(--ink-tertiary)]">{hint}</p>
-      )}
+      {hint && <FieldHint hint={hint} />}
       <FieldErrors />
     </div>
   )
@@ -99,7 +110,7 @@ export function TextArea({
     <div>
       <Label
         htmlFor={label}
-        className="mb-2 text-sm font-semibold text-[var(--ink)]"
+        className="mb-2 text-sm font-medium text-[var(--ink)]"
       >
         {label}
       </Label>
@@ -129,7 +140,7 @@ export function SelectField({
   const field = useFieldContext<string>()
   return (
     <div>
-      <Label className="mb-2 block text-sm font-semibold text-[var(--ink)]">
+      <Label className="mb-2 block text-sm font-medium text-[var(--ink)]">
         {label}
       </Label>
       <ShadcnSelect.Select
@@ -155,9 +166,7 @@ export function SelectField({
           </ShadcnSelect.SelectGroup>
         </ShadcnSelect.SelectContent>
       </ShadcnSelect.Select>
-      {hint && (
-        <p className="mt-1 text-xs text-[var(--ink-tertiary)]">{hint}</p>
-      )}
+      {hint && <FieldHint hint={hint} />}
       <FieldErrors />
     </div>
   )
@@ -177,14 +186,14 @@ export function SliderField({
   const field = useFieldContext<number>()
   return (
     <div>
-      <div className="mb-2 flex items-baseline justify-between">
+      <div className="mb-2.5 flex items-baseline justify-between">
         <Label
           htmlFor={label}
-          className="text-sm font-semibold text-[var(--ink)]"
+          className="text-sm font-medium text-[var(--ink)]"
         >
           {label}
         </Label>
-        <span className="text-sm font-semibold tabular-nums text-[var(--primary)]">
+        <span className="rounded-md bg-[var(--primary-tint)] px-2 py-0.5 text-sm font-semibold tabular-nums text-[var(--primary-strong)]">
           {format(field.state.value)}
         </span>
       </div>
@@ -213,22 +222,20 @@ export function TriStateSwitchField({
   const value = field.state.value
   return (
     <div className="flex items-start justify-between gap-4">
-      <div>
+      <div className="min-w-0">
         <Label
           htmlFor={label}
-          className="text-sm font-semibold text-[var(--ink)]"
+          className="text-sm font-medium text-[var(--ink)]"
         >
           {label}
         </Label>
-        {hint && (
-          <p className="mt-1 text-xs text-[var(--ink-tertiary)]">{hint}</p>
-        )}
+        {hint && <FieldHint hint={hint} />}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2 pt-0.5">
         {value !== null && (
           <button
             type="button"
-            className="text-xs text-[var(--ink-tertiary)] underline"
+            className="text-xs text-[var(--ink-tertiary)] underline hover:text-[var(--ink)]"
             onClick={() => field.handleChange(null)}
           >
             clear
@@ -291,7 +298,7 @@ export function ChipsField({
     <div>
       <Label
         htmlFor={label}
-        className="mb-2 block text-sm font-semibold text-[var(--ink)]"
+        className="mb-2 block text-sm font-medium text-[var(--ink)]"
       >
         {label}
       </Label>
@@ -313,39 +320,37 @@ export function ChipsField({
           Add
         </Button>
       </div>
-      {hint && (
-        <p className="mt-1 text-xs text-[var(--ink-tertiary)]">{hint}</p>
-      )}
+      {hint && <FieldHint hint={hint} />}
       {field.state.value.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1.5">
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
           {field.state.value.map((chip) => (
             <span
               key={chip}
-              className="inline-flex items-center gap-1 rounded-full border border-[var(--card-border)] bg-[var(--fog)] px-2.5 py-1 text-xs text-[var(--ink)]"
+              className="inline-flex items-center gap-1 rounded-full border border-[var(--divider)] bg-[var(--primary-tint)] py-1 pr-1 pl-2.5 text-xs font-medium text-[var(--primary-strong)]"
             >
               {chip}
               <button
                 type="button"
                 aria-label={`Remove ${chip}`}
-                className="text-[var(--ink-tertiary)] transition hover:text-[var(--error)]"
+                className="-mr-0.5 inline-flex size-5 items-center justify-center rounded-full text-[var(--primary-strong)] transition hover:bg-[color-mix(in_oklab,var(--status-danger)_12%,transparent)] hover:text-[var(--status-danger)]"
                 onClick={() => removeChip(chip)}
               >
-                <X className="size-3" />
+                <X aria-hidden className="size-3" />
               </button>
             </span>
           ))}
         </div>
       )}
       {unusedSuggestions.length > 0 && (
-        <div className="mt-2 flex flex-wrap items-center gap-1">
-          <span className="text-[11px] text-[var(--ink-tertiary)]">
+        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+          <span className="text-xs text-[var(--ink-tertiary)]">
             Suggestions:
           </span>
           {unusedSuggestions.map((suggestion) => (
             <button
               key={suggestion}
               type="button"
-              className="rounded-full border border-dashed border-[var(--dashed-border)] px-2 py-0.5 text-[11px] text-[var(--ink-secondary)] transition hover:border-[var(--store-blue)] hover:text-[var(--store-blue)]"
+              className="rounded-full border border-dashed border-[var(--dashed-border)] px-2.5 py-0.5 text-xs text-[var(--ink-secondary)] transition hover:border-[var(--primary)] hover:bg-[var(--primary-tint)] hover:text-[var(--primary-strong)]"
               onClick={() =>
                 field.handleChange([...field.state.value, suggestion])
               }
@@ -385,7 +390,7 @@ export function LanguageRowsField({
 
   return (
     <div>
-      <Label className="mb-2 block text-sm font-semibold text-[var(--ink)]">
+      <Label className="mb-2 block text-sm font-medium text-[var(--ink)]">
         {label}
       </Label>
       <div className="space-y-2">
@@ -427,12 +432,12 @@ export function LanguageRowsField({
             <button
               type="button"
               aria-label="Remove language"
-              className="rounded p-1.5 text-[var(--ink-tertiary)] transition hover:bg-[var(--fog)] hover:text-[var(--error)]"
+              className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-[var(--ink-tertiary)] transition hover:bg-[color-mix(in_oklab,var(--status-danger)_10%,transparent)] hover:text-[var(--status-danger)]"
               onClick={() =>
                 field.handleChange(rows.filter((_, i) => i !== index))
               }
             >
-              <X className="size-4" />
+              <X aria-hidden className="size-4" />
             </button>
           </div>
         ))}
@@ -440,7 +445,7 @@ export function LanguageRowsField({
       <Button
         type="button"
         variant="outline"
-        size="xs"
+        size="sm"
         className="mt-2"
         onClick={() =>
           field.handleChange([
@@ -488,7 +493,7 @@ export function WorkAuthRowsField({
 
   return (
     <div>
-      <Label className="mb-2 block text-sm font-semibold text-[var(--ink)]">
+      <Label className="mb-2 block text-sm font-medium text-[var(--ink)]">
         {label}
       </Label>
       <div className="space-y-2">
@@ -536,12 +541,12 @@ export function WorkAuthRowsField({
             <button
               type="button"
               aria-label="Remove entry"
-              className="rounded p-1.5 text-[var(--ink-tertiary)] transition hover:bg-[var(--fog)] hover:text-[var(--error)]"
+              className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-[var(--ink-tertiary)] transition hover:bg-[color-mix(in_oklab,var(--status-danger)_10%,transparent)] hover:text-[var(--status-danger)]"
               onClick={() =>
                 field.handleChange(rows.filter((_, i) => i !== index))
               }
             >
-              <X className="size-4" />
+              <X aria-hidden className="size-4" />
             </button>
           </div>
         ))}
@@ -549,7 +554,7 @@ export function WorkAuthRowsField({
       <Button
         type="button"
         variant="outline"
-        size="xs"
+        size="sm"
         className="mt-2"
         onClick={() =>
           field.handleChange([
@@ -564,9 +569,7 @@ export function WorkAuthRowsField({
       >
         + Add country
       </Button>
-      {hint && (
-        <p className="mt-1 text-xs text-[var(--ink-tertiary)]">{hint}</p>
-      )}
+      {hint && <FieldHint hint={hint} />}
       <FieldErrors />
     </div>
   )

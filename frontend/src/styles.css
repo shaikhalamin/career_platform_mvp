@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
@@ -7,59 +7,57 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  DJI-inspired design tokens.
-  Single family (Open Sans, tight tracking), near-black ink at stepped
-  opacities, one engineering blue for action, flat white canvas, charcoal
-  footer. Elevation is rare: borders for cards, soft shadow only for
-  genuinely floating elements.
+  PathPilot design tokens — "Refined professional" system.
+  Inter (tabular numerals for scores), deep sky-blue for action, slate ink
+  ramp (all steps pass 4.5:1 on their surface), one semantic status set for
+  eligibility states. Cards are white, 12px radius, hairline border with a
+  soft shadow on hover; elevation is otherwise rare.
 */
 :root {
   /* Brand & accent */
-  --primary: #0070d5; /* DJI Blue — brand-site action colour */
-  --store-blue: #0060ef; /* store action colour & selection ring */
-  --store-blue-tint: #deeafd; /* pale fill companion */
+  --primary: #0369a1; /* sky-700 — action colour, 5.9:1 on white */
+  --primary-strong: #075985; /* sky-800 — hover / pressed */
+  --primary-tint: #e0f2fe; /* sky-100 — selection fills, chips */
   --on-primary: #ffffff;
-  --link-blue: #1890ff; /* "Learn More ›" text links */
-  --tier-orange: #be4e04; /* product-rank eyebrows — never a button fill */
-  --badge-orange: #fa8c16; /* option corner badge */
+  --link-blue: #0369a1; /* links share the brand blue */
+  --tier-orange: #b45309; /* amber-700 — eyebrows, 6.2:1 on white */
+
+  /* Status set (eligibility + dimension bars) */
+  --status-success: #15803d; /* green-700 */
+  --status-warning: #b45309; /* amber-700 */
+  --status-danger: #dc2626; /* red-600 */
 
   /* Surfaces */
-  --canvas: #ffffff; /* page, nav, cards, purchase bar */
-  --canvas-soft: #f7f9fa; /* feature-link band, store panels, footnotes */
-  --panel: #f6f8f9; /* benefits panel */
-  --fog: #f5f5f5; /* explore band, product-card backdrop, quiet chips */
-  --announce: #fafafa; /* announcement bar, category strip */
-  --media-black: #000000; /* store feature media tiles */
-  --footer: #272727; /* brand-site footer */
-  --footer-pill: #383838;
-  --footer-divider: #414141;
+  --canvas: #ffffff;
+  --canvas-soft: #f8fafc; /* slate-50 — quiet bands, callouts */
+  --panel: #f1f5f9; /* slate-100 — tracks, muted chips */
+  --fog: #f1f5f9;
+  --announce: #f8fafc;
+  --footer: #0f172a; /* slate-900 */
+  --footer-pill: #1e293b;
+  --footer-divider: #334155;
 
   /* Lines */
-  --hairline: #f0f0f0; /* tab tracks */
-  --divider: #e8e8e8; /* FAQ + purchase-bar rules */
-  --card-border: #d9d9d9; /* option cards */
-  --dashed-border: #dddddd; /* unavailable options */
-  --input-border: #d4d7d9; /* store email field */
-  --control-border: #cccccc; /* steppers, checkboxes */
+  --hairline: #f1f5f9;
+  --divider: #e2e8f0; /* slate-200 */
+  --card-border: #e2e8f0;
+  --dashed-border: #cbd5e1; /* slate-300 */
+  --input-border: #cbd5e1;
+  --control-border: #cbd5e1;
 
-  /* Text — ink at stepped opacities, never pure black */
-  --ink: #262626;
-  --ink-secondary: #595959;
-  --ink-tertiary: #8c8c8c;
-  --store-ink: #333333;
-  --graphite: #3b3e40;
-  --nav-ink: #303233;
-  --slate: #6c7073;
-  --steel: #9fa3a6;
-  --footer-link: #b3b3b3;
+  /* Text — slate ink ramp, never pure black */
+  --ink: #0f172a; /* slate-900 */
+  --ink-secondary: #334155; /* slate-700 — 7.5:1 */
+  --ink-tertiary: #475569; /* slate-600 — 5.9:1 */
+  --footer-link: #94a3b8; /* slate-400 on slate-900 */
 
   /* Semantic */
-  --error: #f5222d;
+  --error: #dc2626;
 
-  /* Floating elevation — the only shadow on the system */
-  --shadow-float: 0 8px 16px rgba(0, 0, 0, 0.1);
+  /* Elevation */
+  --shadow-float: 0 8px 24px rgba(15, 23, 42, 0.1);
 
-  /* shadcn semantic mapping onto the DJI palette */
+  /* shadcn semantic mapping */
   --background: var(--canvas);
   --foreground: var(--ink);
   --card: var(--canvas);
@@ -69,66 +67,71 @@
   --primary-foreground: var(--on-primary);
   --secondary: var(--canvas-soft);
   --secondary-foreground: var(--ink);
-  --muted: var(--fog);
-  --muted-foreground: var(--ink-secondary);
-  --accent: var(--fog);
-  --accent-foreground: var(--ink);
+  --muted: var(--panel);
+  --muted-foreground: var(--ink-tertiary);
+  --accent: var(--primary-tint);
+  --accent-foreground: var(--primary-strong);
   --destructive: var(--error);
   --destructive-foreground: var(--on-primary);
   --border: var(--divider);
   --input: var(--input-border);
-  --ring: var(--store-blue);
-  --chart-1: var(--primary);
-  --chart-2: var(--store-blue);
-  --chart-3: var(--badge-orange);
-  --chart-4: var(--steel);
-  --chart-5: var(--tier-orange);
-  --radius: 0.5rem; /* radius-lg = 8px option cards, radius-sm = 4px tags */
+  --ring: #0284c7; /* sky-600 */
+  --chart-1: #0369a1;
+  --chart-2: #0ea5e9;
+  --chart-3: #b45309;
+  --chart-4: #15803d;
+  --chart-5: #dc2626;
+  --radius: 0.75rem; /* cards 12px; radius-md 10px controls, radius-sm 8px tags */
   --sidebar: var(--canvas-soft);
   --sidebar-foreground: var(--ink);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--on-primary);
-  --sidebar-accent: var(--fog);
+  --sidebar-accent: var(--panel);
   --sidebar-accent-foreground: var(--ink);
   --sidebar-border: var(--divider);
-  --sidebar-ring: var(--store-blue);
+  --sidebar-ring: var(--ring);
 }
 
-/* Dark mode: same skeleton, charcoal surfaces with the ink ramp flipped. */
+/* Dark mode: same skeleton, deep-slate surfaces with the ink ramp flipped. */
 .dark {
-  --primary: #1890ff;
-  --store-blue: #1890ff;
-  --store-blue-tint: #14263f;
-  --tier-orange: #d97a3c;
-  --error: #ff4d4f;
+  --primary: #38bdf8; /* sky-400 — 7.1:1 on slate-950 */
+  --primary-strong: #7dd3fc; /* sky-300 — hover */
+  --primary-tint: #0c2a3f;
+  --on-primary: #082f49; /* sky-950 text on bright blue fills */
+  --link-blue: #38bdf8;
+  --tier-orange: #fbbf24; /* amber-400 */
 
-  --canvas: #171717;
-  --canvas-soft: #1e1e1e;
-  --panel: #1c1c1c;
-  --fog: #232323;
-  --announce: #1a1a1a;
-  --footer: #101010;
-  --footer-pill: #2b2b2b;
-  --footer-divider: #333333;
+  --status-success: #4ade80; /* green-400 */
+  --status-warning: #fbbf24;
+  --status-danger: #f87171; /* red-400 */
 
-  --hairline: #262626;
-  --divider: #333333;
-  --card-border: #3d3d3d;
-  --dashed-border: #3a3a3a;
-  --input-border: #414141;
-  --control-border: #4a4a4a;
+  --canvas: #0f172a; /* slate-950-tinted base */
+  --canvas-soft: #111c2e;
+  --panel: #1e293b; /* slate-800 */
+  --fog: #1e293b;
+  --announce: #131c2c;
+  --footer: #020617; /* slate-950 */
+  --footer-pill: #1e293b;
+  --footer-divider: #1e293b;
 
-  --ink: #f0f0f0;
-  --ink-secondary: #b3b3b3;
-  --ink-tertiary: #8c8c8c;
-  --store-ink: #e6e6e6;
-  --graphite: #d9d9d9;
-  --nav-ink: #e8e8e8;
-  --footer-link: #b3b3b3;
+  --hairline: #1e293b;
+  --divider: #26334a;
+  --card-border: #26334a;
+  --dashed-border: #334155;
+  --input-border: #334155;
+  --control-border: #334155;
+
+  --ink: #f1f5f9; /* slate-100 */
+  --ink-secondary: #cbd5e1; /* slate-300 */
+  --ink-tertiary: #94a3b8; /* slate-400 — 5.2:1 on slate-950 */
+  --footer-link: #94a3b8;
+
+  --error: #f87171;
+  --ring: #38bdf8;
 }
 
 @theme inline {
-  --font-sans: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 
   /* shadcn semantic colours */
   --color-background: var(--background);
@@ -168,13 +171,12 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* DJI raw tokens as utilities (bg-canvas, text-ink-secondary, …) */
+  /* Raw tokens as utilities (bg-canvas, text-ink-secondary, …) */
   --color-canvas: var(--canvas);
   --color-canvas-soft: var(--canvas-soft);
   --color-panel: var(--panel);
   --color-fog: var(--fog);
   --color-announce: var(--announce);
-  --color-media-black: var(--media-black);
   --color-footer: var(--footer);
   --color-footer-pill: var(--footer-pill);
   --color-footer-divider: var(--footer-divider);
@@ -187,18 +189,15 @@
   --color-ink: var(--ink);
   --color-ink-secondary: var(--ink-secondary);
   --color-ink-tertiary: var(--ink-tertiary);
-  --color-store-ink: var(--store-ink);
-  --color-graphite: var(--graphite);
-  --color-nav-ink: var(--nav-ink);
-  --color-slate: var(--slate);
-  --color-steel: var(--steel);
   --color-footer-link: var(--footer-link);
-  --color-store-blue: var(--store-blue);
-  --color-store-blue-tint: var(--store-blue-tint);
+  --color-primary-strong: var(--primary-strong);
+  --color-primary-tint: var(--primary-tint);
   --color-on-primary: var(--on-primary);
   --color-link-blue: var(--link-blue);
   --color-tier-orange: var(--tier-orange);
-  --color-badge-orange: var(--badge-orange);
+  --color-status-success: var(--status-success);
+  --color-status-warning: var(--status-warning);
+  --color-status-danger: var(--status-danger);
   --color-error: var(--error);
 }
 
@@ -213,15 +212,16 @@ body {
   color: var(--ink);
   font-family: var(--font-sans);
   background-color: var(--canvas);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.011em;
+  font-feature-settings: 'cv11', 'ss01';
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-  background: var(--store-blue-tint);
-  color: var(--ink);
+  background: var(--primary-tint);
+  color: var(--primary-strong);
 }
 
 h1,
@@ -231,7 +231,8 @@ h4,
 h5,
 h6 {
   font-weight: 600;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
 }
 
 code {
@@ -239,7 +240,7 @@ code {
   border: 1px solid var(--hairline);
   background: var(--fog);
   color: var(--ink);
-  border-radius: 4px;
+  border-radius: 6px;
   padding: 2px 7px;
 }
 
@@ -254,103 +255,62 @@ pre code {
 
 .prose pre {
   border: 1px solid var(--divider);
-  border-radius: 0;
-  background: var(--media-black);
-  color: #e8efff;
+  border-radius: 8px;
+  background: #0f172a;
+  color: #e0f2fe;
 }
 
-/* 1200px store container */
+/* 1200px app container */
 .page-wrap {
   width: min(1200px, calc(100% - 2rem));
   margin-inline: auto;
 }
 
-/* Display headings — Open Sans 600, compact tracking (typography.display*) */
+/* Display headings — Inter 600, tight tracking */
 .display-title {
   color: var(--ink);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.03em;
 }
 
-/* Flat card: canvas surface, hairline rule, square corners */
+/* Card: canvas surface, hairline border, 12px radius, hover lifts gently */
 .panel-card {
-  background: var(--canvas);
-  border: 1px solid var(--divider);
-  border-radius: 0;
-}
-
-.feature-card {
-  background: var(--canvas);
-}
-
-.feature-card:hover {
-  border-color: var(--card-border);
-}
-
-/* Pill CTAs (button-primary / button-outline) */
-.pill-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: 9999px;
-  background: var(--primary);
-  color: var(--on-primary);
-  font-size: 16px;
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  text-decoration: none;
-}
-
-.pill-primary:hover {
-  background: color-mix(in oklab, var(--primary) 88%, black);
-}
-
-.pill-outline {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-  padding: 0 15px;
-  border: 1px solid var(--ink);
-  border-radius: 9999px;
-  background: transparent;
-  color: var(--ink);
-  font-size: 16px;
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  text-decoration: none;
-}
-
-.pill-outline:hover {
-  background: var(--fog);
-}
-
-button,
-a {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
   transition:
-    background-color 180ms ease,
-    color 180ms ease,
-    border-color 180ms ease;
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
 }
 
-/* Product-rank eyebrow (tier-eyebrow) */
+.panel-card.is-interactive:hover {
+  border-color: color-mix(in oklab, var(--primary) 35%, var(--card-border));
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.07);
+}
+
+a.panel-card,
+article.panel-card {
+  display: block;
+}
+
+/* Product-rank eyebrow */
 .tier-eyebrow {
   font-size: 12px;
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--tier-orange);
 }
 
-/* Nav labels: 14px nav-ink with an ink underline on hover/active */
+/* Nav labels: 14px with an ink underline on hover/active */
 .nav-link {
   position: relative;
   text-decoration: none;
-  color: var(--nav-ink);
+  color: var(--ink-secondary);
   font-size: 14px;
-  letter-spacing: -0.02em;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .nav-link::after {
@@ -360,9 +320,10 @@ a {
   bottom: -8px;
   width: 100%;
   height: 2px;
+  border-radius: 1px;
   transform: scaleX(0);
   transform-origin: left;
-  background: var(--ink);
+  background: var(--primary);
   transition: transform 170ms ease;
 }
 
@@ -374,6 +335,27 @@ a {
 .nav-link:hover::after,
 .nav-link.is-active::after {
   transform: scaleX(1);
+}
+
+button,
+a {
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease;
+}
+
+/* Guaranteed keyboard focus indicator on every interactive element
+   (shadcn primitives bring their own ring; this covers custom links,
+   selects, chips and icon buttons). */
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 
 .rise-in {
@@ -388,6 +370,34 @@ a {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Circular score gauge fill (see components/score-gauge.tsx) */
+.gauge-arc {
+  animation: gauge-fill 900ms cubic-bezier(0.16, 1, 0.3, 1) 150ms both;
+}
+
+@keyframes gauge-fill {
+  from {
+    stroke-dashoffset: var(--gauge-circ);
+  }
+  to {
+    stroke-dashoffset: var(--gauge-offset);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
@@ -412,6 +422,6 @@ a {
     text-underline-offset: 2px;
   }
   a:hover {
-    color: var(--primary);
+    color: var(--primary-strong);
   }
 }

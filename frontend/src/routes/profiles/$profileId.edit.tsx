@@ -1,8 +1,10 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
+import { ArrowLeft } from 'lucide-react'
 
 import { Button } from '#/components/ui/button'
 import { CareerProfileForm } from '#/components/career-profile-form'
+import { FormSkeleton } from '#/components/skeletons'
 import { useActiveProfile } from '#/lib/active-profile'
 import { profileToFormValues } from '#/lib/career-form'
 import {
@@ -23,7 +25,7 @@ function EditProfilePage() {
   if (!Number.isInteger(profileIdNum) || profileIdNum < 1) {
     return (
       <main className="page-wrap py-10">
-        <p className="text-sm font-semibold text-red-600">
+        <p className="text-sm font-semibold text-[var(--error)]">
           Invalid profile id: {profileId}
         </p>
       </main>
@@ -47,7 +49,7 @@ function EditProfileForm({ profileId }: { profileId: number }) {
   if (profileQuery.isPending) {
     return (
       <main className="page-wrap py-10">
-        <p className="text-sm text-[var(--ink-secondary)]">Loading profile…</p>
+        <FormSkeleton />
       </main>
     )
   }
@@ -55,10 +57,10 @@ function EditProfileForm({ profileId }: { profileId: number }) {
   if (profileQuery.isError || !profileQuery.data.data) {
     return (
       <main className="page-wrap py-10">
-        <p className="text-sm font-semibold text-red-600">
+        <p className="text-sm font-semibold text-[var(--error)]">
           Profile {profileId} not found.
         </p>
-        <Button asChild variant="outline" size="xs" className="mt-4">
+        <Button asChild variant="outline" size="sm" className="mt-4">
           <a href="/profiles">Back to profiles</a>
         </Button>
       </main>
@@ -69,6 +71,12 @@ function EditProfileForm({ profileId }: { profileId: number }) {
 
   return (
     <main className="page-wrap py-10">
+      <Button asChild variant="ghost" size="sm" className="mb-4 -ml-2">
+        <Link to="/profiles">
+          <ArrowLeft aria-hidden />
+          Back to profiles
+        </Link>
+      </Button>
       <CareerProfileForm
         key={profile.id}
         initialValues={profileToFormValues(profile)}

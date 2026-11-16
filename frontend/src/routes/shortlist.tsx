@@ -1,5 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { CalendarClock, Heart, MapPin, Quote } from 'lucide-react'
 
+import { Button } from '#/components/ui/button'
+import { PageHeader } from '#/components/page-header'
+import { EmptyState } from '#/components/empty-state'
+import { ListRowsSkeleton } from '#/components/skeletons'
 import { useActiveProfile } from '#/lib/active-profile'
 import { ShortlistButton } from '#/components/shortlist-button'
 import { useListShortlistApiV1ShortlistGet } from '#/gen/queries/shortlist/useListShortlistApiV1ShortlistGet'
@@ -14,16 +19,16 @@ function ShortlistPage() {
   if (activeProfileId === null) {
     return (
       <main className="page-wrap py-16">
-        <div className="panel-card mx-auto max-w-lg p-8 text-center">
-          <h1 className="display-title m-0 text-2xl">No active profile</h1>
-          <p className="mt-3 text-sm text-[var(--ink-secondary)]">
-            Shortlists belong to a profile — pick one to see saved
-            opportunities.
-          </p>
-          <Link to="/profiles" className="pill-primary mt-6">
-            Choose a profile
-          </Link>
-        </div>
+        <EmptyState
+          icon={Heart}
+          title="No active profile"
+          description="Shortlists belong to a profile — pick one to see saved opportunities."
+          actions={
+            <Button asChild>
+              <Link to="/profiles">Choose a profile</Link>
+            </Button>
+          }
+        />
       </main>
     )
   }
@@ -39,39 +44,39 @@ function ShortlistList({ profileId }: { profileId: number }) {
 
   return (
     <main className="page-wrap py-10">
-      <div className="mb-6">
-        <p className="tier-eyebrow mb-2">Wishlist</p>
-        <h1 className="display-title m-0 text-3xl font-semibold tracking-tight text-[var(--ink)]">
-          Shortlisted opportunities
-        </h1>
-        <p className="mt-2 text-sm text-[var(--ink-secondary)]">
-          Saved roles for this profile — match scores stay current because
-          they're recomputed from your live profile.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Wishlist"
+        title="Shortlisted opportunities"
+        description="Saved roles for this profile — match scores stay current because they're recomputed from your live profile."
+      />
 
       {query.isPending ? (
-        <p className="text-sm text-[var(--ink-secondary)]">
-          Loading shortlist…
-        </p>
+        <ListRowsSkeleton count={3} />
       ) : items.length === 0 ? (
-        <div className="panel-card p-10 text-center text-sm text-[var(--ink-secondary)]">
-          Nothing saved yet — shortlist roles from{' '}
-          <Link to="/recommendations" className="underline">
-            your recommendations
-          </Link>{' '}
-          or the{' '}
-          <Link to="/opportunities" className="underline">
-            catalogue
-          </Link>
-          .
-        </div>
+        <EmptyState
+          icon={Heart}
+          title="Nothing saved yet"
+          description="Shortlist roles that interest you and they'll wait here — scores and eligibility stay up to date with your profile."
+          actions={
+            <>
+              <Button asChild>
+                <Link to="/recommendations">Browse recommendations</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/opportunities">Search the catalogue</Link>
+              </Button>
+            </>
+          }
+        />
       ) : (
         <div className="space-y-4">
           {items.map((item) => (
-            <article key={item.id} className="panel-card p-5">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
+            <article
+              key={item.id}
+              className="panel-card is-interactive p-5 sm:p-6"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="min-w-0">
                   <Link
                     to="/opportunities/$opportunityId"
                     params={{ opportunityId: item.opportunity.id }}
@@ -79,12 +84,31 @@ function ShortlistList({ profileId }: { profileId: number }) {
                   >
                     {item.opportunity.title}
                   </Link>
-                  <p className="m-0 text-xs text-[var(--ink-secondary)]">
-                    {item.opportunity.organisation} · {item.opportunity.country}{' '}
-                    · saved {new Date(item.created_at).toLocaleDateString()}
-                  </p>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[var(--ink-secondary)]">
+                    <span className="font-medium">
+                      {item.opportunity.organisation}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <MapPin
+                        aria-hidden
+                        className="size-3 text-[var(--ink-tertiary)]"
+                      />
+                      {item.opportunity.country}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <CalendarClock
+                        aria-hidden
+                        className="size-3 text-[var(--ink-tertiary)]"
+                      />
+                      saved {new Date(item.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
                   {item.note && (
-                    <p className="mt-2 rounded-md bg-[var(--fog)] px-3 py-1.5 text-xs text-[var(--ink-secondary)]">
+                    <p className="mt-3 flex gap-2 rounded-lg bg-[var(--canvas-soft)] py-2 pr-3 pl-2.5 text-xs leading-relaxed text-[var(--ink-secondary)]">
+                      <Quote
+                        aria-hidden
+                        className="mt-0.5 size-3 shrink-0 text-[var(--ink-tertiary)]"
+                      />
                       {item.note}
                     </p>
                   )}

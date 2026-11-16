@@ -1,14 +1,19 @@
 import { useState } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, CircleAlert, Compass, Trophy } from 'lucide-react'
 
+import { Badge } from '#/components/ui/badge'
+import { Button } from '#/components/ui/button'
+import { PageHeader } from '#/components/page-header'
+import { EmptyState } from '#/components/empty-state'
+import { ListRowsSkeleton } from '#/components/skeletons'
+import { ScoreGauge } from '#/components/score-gauge'
 import {
   DisclaimerNote,
   DimensionBars,
   EligibilityBadge,
   EligibilityChecks,
   ExplanationLists,
-  ScoreMeter,
 } from '#/components/match'
 import { ShortlistButton } from '#/components/shortlist-button'
 import { useActiveProfile } from '#/lib/active-profile'
@@ -34,21 +39,21 @@ function RecommendationsPage() {
   if (activeProfileId === null) {
     return (
       <main className="page-wrap py-16">
-        <div className="panel-card mx-auto max-w-lg p-8 text-center">
-          <h1 className="display-title m-0 text-2xl">Who are we matching?</h1>
-          <p className="mt-3 text-sm text-[var(--ink-secondary)]">
-            Pick an existing profile or create one — recommendations are
-            computed live from it.
-          </p>
-          <div className="mt-6 flex justify-center gap-3">
-            <Link to="/profiles" className="pill-outline">
-              Choose a profile
-            </Link>
-            <Link to="/profiles/new" className="pill-primary">
-              Create a profile
-            </Link>
-          </div>
-        </div>
+        <EmptyState
+          icon={Compass}
+          title="Who are we matching?"
+          description="Pick an existing profile or create one — recommendations are computed live from it."
+          actions={
+            <>
+              <Button asChild variant="outline">
+                <Link to="/profiles">Choose a profile</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/profiles/new">Create a profile</Link>
+              </Button>
+            </>
+          }
+        />
       </main>
     )
   }
@@ -84,9 +89,11 @@ function RecommendationsList({
   if (query.isPending) {
     return (
       <main className="page-wrap py-10">
-        <p className="text-sm text-[var(--ink-secondary)]">
-          Ranking opportunities…
-        </p>
+        <PageHeader
+          eyebrow="Recommendations · recalculated live"
+          title="Top matches"
+        />
+        <ListRowsSkeleton count={4} />
       </main>
     )
   }
@@ -94,9 +101,17 @@ function RecommendationsList({
   if (query.isError || !query.data.data) {
     return (
       <main className="page-wrap py-10">
-        <p className="text-sm font-semibold text-red-600">
+        <PageHeader
+          eyebrow="Recommendations · recalculated live"
+          title="Top matches"
+        />
+        <div
+          role="alert"
+          className="flex items-center gap-3 rounded-xl border border-[color-mix(in_oklab,var(--error)_30%,transparent)] bg-[color-mix(in_oklab,var(--error)_6%,transparent)] px-5 py-4 text-sm font-medium text-[var(--error)]"
+        >
+          <CircleAlert aria-hidden className="size-5 shrink-0" />
           Failed to load recommendations — is the backend running on port 8000?
-        </p>
+        </div>
       </main>
     )
   }
@@ -106,34 +121,27 @@ function RecommendationsList({
 
   return (
     <main className="page-wrap py-10">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="tier-eyebrow mb-2">
-            Recommendations · recalculated live
-          </p>
-          <h1 className="display-title m-0 text-3xl font-semibold tracking-tight text-[var(--ink)]">
-            Top matches for {data.profile_name}
-          </h1>
-          <p className="mt-2 text-sm text-[var(--ink-secondary)]">
-            {data.retrieved_count} of {data.total_opportunities} opportunities ·
-            ranked by eligibility first, then six-part match score
-          </p>
-        </div>
-        <label className="flex items-center gap-2 text-xs text-[var(--ink-secondary)]">
-          Show top
-          <select
-            value={topK}
-            onChange={(e) => onTopKChange(Number(e.target.value))}
-            className="rounded-md border border-[var(--input-border)] bg-transparent px-2 py-1.5 text-sm"
-          >
-            {[10, 20, 30, 50].map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+      <PageHeader
+        eyebrow="Recommendations · recalculated live"
+        title={`Top matches for ${data.profile_name}`}
+        description={`${data.retrieved_count} of ${data.total_opportunities} opportunities · ranked by eligibility first, then six-part match score`}
+        actions={
+          <label className="flex items-center gap-2 text-sm text-[var(--ink-secondary)]">
+            Show top
+            <select
+              value={topK}
+              onChange={(e) => onTopKChange(Number(e.target.value))}
+              className="rounded-lg border border-[var(--input-border)] bg-[var(--canvas)] px-2.5 py-1.5 text-sm font-medium text-[var(--ink)]"
+            >
+              {[10, 20, 30, 50].map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </label>
+        }
+      />
 
       <div className="mb-6">
         <DisclaimerNote text={data.disclaimer} />
@@ -155,7 +163,7 @@ function RecommendationsList({
         ))}
       </div>
 
-      <p className="mt-6 text-center text-xs text-[var(--ink-tertiary)]">
+      <p className="mt-8 text-center text-xs text-[var(--ink-tertiary)]">
         Weights: Skills 35 · Experience 20 · Education 15 · Location 15 ·
         Language 10 · Interests 5 — see{' '}
         <Link to="/about" className="underline">
@@ -179,14 +187,25 @@ function RecommendationCard({
   onToggle: () => void
 }) {
   const opportunity = item.opportunity
+  const topRank = item.rank === 1
+
   return (
-    <article className="panel-card p-5">
-      <div className="flex flex-wrap items-start justify-between gap-4">
+    <article className="panel-card is-interactive p-5 sm:p-6">
+      <div className="flex flex-wrap items-start gap-x-5 gap-y-4">
+        {/* Rank tile */}
+        <span
+          aria-hidden
+          className={`inline-flex size-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold tabular-nums ${
+            topRank
+              ? 'bg-[color-mix(in_oklab,var(--tier-orange)_15%,transparent)] text-[var(--tier-orange)]'
+              : 'bg-[var(--panel)] text-[var(--ink-secondary)]'
+          }`}
+        >
+          {topRank ? <Trophy className="size-4.5" /> : item.rank}
+        </span>
+
         <div className="min-w-0 flex-1">
-          <div className="mb-1 flex items-center gap-2">
-            <span className="inline-flex size-7 items-center justify-center rounded-full bg-[var(--fog)] text-xs font-bold text-[var(--ink-secondary)]">
-              {item.rank}
-            </span>
+          <div className="mb-1 flex flex-wrap items-center gap-2">
             <Link
               to="/opportunities/$opportunityId"
               params={{ opportunityId: opportunity.id }}
@@ -194,6 +213,7 @@ function RecommendationCard({
             >
               {opportunity.title}
             </Link>
+            {topRank && <Badge variant="warning">Best match</Badge>}
           </div>
           <p className="m-0 text-xs text-[var(--ink-secondary)]">
             {opportunity.organisation} ·{' '}
@@ -203,24 +223,26 @@ function RecommendationCard({
               opportunity.employment_type}{' '}
             · {opportunity.min_years}–{opportunity.max_years} yrs
           </p>
-          <div className="mt-2 flex flex-wrap gap-1">
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
             {opportunity.required_skills.slice(0, 4).map((skill) => (
-              <span
+              <Badge
                 key={skill}
-                className="rounded-sm bg-[var(--fog)] px-1.5 py-0.5 text-[10px] text-[var(--ink-secondary)]"
+                variant="secondary"
+                className="px-2 py-0 font-normal"
               >
                 {skill}
-              </span>
+              </Badge>
             ))}
           </div>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <ScoreMeter score={item.total_score} max={item.max_score} />
+
+        <div className="flex shrink-0 items-center gap-4">
+          <ScoreGauge score={item.total_score} max={item.max_score} size="sm" />
           <EligibilityBadge eligibility={item.eligibility} />
         </div>
       </div>
 
-      <div className="mt-4 border-t border-[var(--divider)] pt-3">
+      <div className="mt-5 border-t border-[var(--divider)] pt-4">
         <ExplanationLists strengths={item.strengths} gaps={item.gaps} />
       </div>
 
@@ -230,42 +252,52 @@ function RecommendationCard({
           opportunityId={opportunity.id}
           shortlisted={item.shortlisted ?? false}
         />
-        <Link
-          to="/opportunities/$opportunityId"
-          params={{ opportunityId: opportunity.id }}
-          className="text-xs font-semibold text-[var(--link-blue)] underline-offset-2 hover:underline"
-        >
-          View details →
-        </Link>
+        <Button asChild variant="ghost" size="sm">
+          <Link
+            to="/opportunities/$opportunityId"
+            params={{ opportunityId: opportunity.id }}
+          >
+            View details
+          </Link>
+        </Button>
         <button
           type="button"
           onClick={onToggle}
           aria-expanded={expanded}
-          className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-[var(--ink-secondary)] hover:text-[var(--ink)]"
+          className="ml-auto inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-semibold text-[var(--ink-secondary)] transition hover:text-[var(--ink)]"
         >
           {expanded ? 'Hide score breakdown' : 'Why this score?'}
           <ChevronDown
-            className={`size-3.5 transition-transform ${expanded ? 'rotate-180' : ''}`}
+            aria-hidden
+            className={`size-3.5 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
           />
         </button>
       </div>
 
-      {expanded && (
-        <div className="mt-4 grid gap-5 border-t border-[var(--divider)] pt-4 sm:grid-cols-2">
-          <div>
-            <p className="mb-2 text-xs font-bold uppercase tracking-wider text-[var(--ink-secondary)]">
-              Six-part score · cosine {item.cosine_similarity.toFixed(3)}
-            </p>
-            <DimensionBars breakdown={item.score_breakdown} />
-          </div>
-          <div>
-            <p className="mb-2 text-xs font-bold uppercase tracking-wider text-[var(--ink-secondary)]">
-              Eligibility evidence
-            </p>
-            <EligibilityChecks eligibility={item.eligibility} />
+      <div
+        className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
+          expanded
+            ? 'mt-4 grid-rows-[1fr] opacity-100'
+            : 'grid-rows-[0fr] opacity-0'
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="grid gap-6 border-t border-[var(--divider)] pt-5 sm:grid-cols-2">
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--ink-secondary)]">
+                Six-part score · cosine {item.cosine_similarity.toFixed(3)}
+              </p>
+              <DimensionBars breakdown={item.score_breakdown} />
+            </div>
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--ink-secondary)]">
+                Eligibility evidence
+              </p>
+              <EligibilityChecks eligibility={item.eligibility} />
+            </div>
           </div>
         </div>
-      )}
+      </div>
     </article>
   )
 }

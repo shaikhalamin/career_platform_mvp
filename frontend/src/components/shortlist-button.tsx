@@ -27,7 +27,8 @@ export function ShortlistButton({
 
   if (profileId === null) {
     return (
-      <span className="text-[11px] text-[var(--ink-tertiary)]">
+      <span className="inline-flex items-center gap-1.5 text-xs text-[var(--ink-tertiary)]">
+        <Heart aria-hidden className="size-3.5" />
         Pick a profile to shortlist
       </span>
     )

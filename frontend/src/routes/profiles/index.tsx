@@ -1,7 +1,22 @@
+import { useState } from 'react'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
+import {
+  Briefcase,
+  GraduationCap,
+  MapPin,
+  Plus,
+  Trash2,
+  UserRound,
+  Wrench,
+} from 'lucide-react'
 
+import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
+import { PageHeader } from '#/components/page-header'
+import { EmptyState } from '#/components/empty-state'
+import { CardGridSkeleton } from '#/components/skeletons'
+import { ConfirmDialog } from '#/components/confirm-dialog'
 import { useActiveProfile } from '#/lib/active-profile'
 import {
   listProfilesApiV1ProfilesGetQueryKey,
@@ -13,6 +28,17 @@ export const Route = createFileRoute('/profiles/')({
   component: ProfilesPage,
 })
 
+/** Deterministic avatar hue per profile name. */
+const AVATAR_HUES = [197, 12, 150, 262, 33, 0, 45, 220]
+
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toUpperCase())
+    .join('')
+}
+
 /**
  * Profile switcher — no signup: anyone can create a profile and switch
  * between them; the active one is remembered in this browser.
@@ -21,6 +47,7 @@ function ProfilesPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { activeProfileId, setActiveProfile } = useActiveProfile()
+  const [pendingDelete, setPendingDelete] = useState<number | null>(null)
   const listQuery = useListProfilesApiV1ProfilesGet({
     query: { page: 1, page_size: 100 },
   })
@@ -41,78 +68,129 @@ function ProfilesPage() {
 
   return (
     <main className="page-wrap py-10">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="tier-eyebrow mb-2">No signup — just profiles</p>
-          <h1 className="display-title m-0 text-3xl font-semibold tracking-tight text-[var(--ink)]">
-            Profiles
-          </h1>
-          <p className="mt-2 max-w-xl text-sm text-[var(--ink-secondary)]">
-            Several people can share this prototype: create a profile each and
-            switch between them. The active profile drives recommendations and
-            the shortlist.
-          </p>
-        </div>
-        <Button asChild>
-          <Link to="/profiles/new">New profile</Link>
-        </Button>
-      </div>
+      <PageHeader
+        eyebrow="No signup — just profiles"
+        title="Profiles"
+        description="Several people can share this prototype: create a profile each and switch between them. The active profile drives recommendations and the shortlist."
+        actions={
+          <Button asChild>
+            <Link to="/profiles/new">
+              <Plus aria-hidden />
+              New profile
+            </Link>
+          </Button>
+        }
+      />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {listQuery.isPending ? (
-          <p className="text-sm text-[var(--ink-secondary)]">
-            Loading profiles…
-          </p>
-        ) : profiles.length === 0 ? (
-          <div className="panel-card p-8 text-center text-sm text-[var(--ink-secondary)] sm:col-span-2 lg:col-span-3">
-            No profiles yet — create the first one to start matching.
-          </div>
-        ) : (
-          profiles.map((profile) => {
+      {listQuery.isPending ? (
+        <CardGridSkeleton count={3} />
+      ) : profiles.length === 0 ? (
+        <EmptyState
+          icon={UserRound}
+          title="No profiles yet"
+          description="Create the first one to start matching — it takes about three minutes and needs no signup."
+          actions={
+            <Button asChild>
+              <Link to="/profiles/new">
+                <Plus aria-hidden />
+                Create a profile
+              </Link>
+            </Button>
+          }
+        />
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {profiles.map((profile) => {
             const isActive = profile.id === activeProfileId
+            const hue =
+              AVATAR_HUES[
+                profile.name
+                  .split('')
+                  .reduce((sum, char) => sum + char.charCodeAt(0), 0) %
+                  AVATAR_HUES.length
+              ]
             return (
               <article
                 key={profile.id}
-                className={`panel-card flex flex-col p-5 ${isActive ? 'border-[var(--store-blue)]' : ''}`}
+                className={`panel-card flex flex-col p-5 ${
+                  isActive
+                    ? 'border-[color-mix(in_oklab,var(--primary)_45%,var(--divider))] ring-1 ring-[color-mix(in_oklab,var(--primary)_25%,transparent)]'
+                    : ''
+                }`}
               >
-                <div className="mb-1 flex items-center gap-2">
-                  <h2 className="m-0 text-base font-semibold text-[var(--ink)]">
-                    {profile.name}
-                  </h2>
-                  {isActive && (
-                    <span className="rounded-full bg-[color-mix(in_oklab,var(--store-blue)_12%,transparent)] px-2 py-0.5 text-[10px] font-bold text-[var(--store-blue)]">
-                      ACTIVE
-                    </span>
-                  )}
+                <div className="mb-3 flex items-center gap-3">
+                  <span
+                    aria-hidden
+                    className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-sm font-semibold"
+                    style={{
+                      backgroundColor: `oklch(0.93 0.04 ${hue})`,
+                      color: `oklch(0.45 0.11 ${hue})`,
+                    }}
+                  >
+                    {initials(profile.name)}
+                  </span>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="m-0 truncate text-base font-semibold text-[var(--ink)]">
+                        {profile.name}
+                      </h2>
+                      {isActive && <Badge variant="success">Active</Badge>}
+                    </div>
+                    <p className="m-0 truncate text-xs text-[var(--ink-tertiary)]">
+                      {profile.email}
+                    </p>
+                  </div>
                 </div>
-                <p className="m-0 text-xs text-[var(--ink-tertiary)]">
-                  {profile.email}
-                </p>
-                <p className="mt-3 text-xs text-[var(--ink-secondary)]">
-                  {profile.education_level} · {profile.experience_years} yrs ·{' '}
-                  {profile.skills.length} skills
-                </p>
-                <p className="mt-1 text-xs text-[var(--ink-secondary)]">
-                  Prefers {profile.preferred_locations.join(', ') || '—'}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2 border-t border-[var(--divider)] pt-3">
+                <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-xs text-[var(--ink-secondary)]">
+                  <li className="flex items-center gap-1.5">
+                    <GraduationCap
+                      aria-hidden
+                      className="size-3.5 text-[var(--ink-tertiary)]"
+                    />
+                    {profile.education_level}
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <Briefcase
+                      aria-hidden
+                      className="size-3.5 text-[var(--ink-tertiary)]"
+                    />
+                    {profile.experience_years} yrs experience
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <Wrench
+                      aria-hidden
+                      className="size-3.5 text-[var(--ink-tertiary)]"
+                    />
+                    {profile.skills.length} skills
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <MapPin
+                      aria-hidden
+                      className="size-3.5 text-[var(--ink-tertiary)]"
+                    />
+                    <span className="truncate">
+                      Prefers {profile.preferred_locations.join(', ') || '—'}
+                    </span>
+                  </li>
+                </ul>
+                <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-[var(--divider)] pt-4">
                   {isActive ? (
                     <Button
-                      size="xs"
+                      size="sm"
                       onClick={() => navigate({ to: '/recommendations' })}
                     >
                       View recommendations
                     </Button>
                   ) : (
                     <Button
-                      size="xs"
+                      size="sm"
                       variant="outline"
                       onClick={() => setActiveProfile(profile.id)}
                     >
                       Use this profile
                     </Button>
                   )}
-                  <Button asChild variant="ghost" size="xs">
+                  <Button asChild variant="ghost" size="sm">
                     <Link
                       to="/profiles/$profileId/edit"
                       params={{ profileId: String(profile.id) }}
@@ -120,23 +198,37 @@ function ProfilesPage() {
                       Edit
                     </Link>
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="xs"
-                    className="ml-auto text-red-600 hover:text-red-700"
-                    disabled={deleteProfile.isPending}
-                    onClick={() =>
-                      deleteProfile.mutate({ path: { profile_id: profile.id } })
+                  <ConfirmDialog
+                    open={pendingDelete === profile.id}
+                    onOpenChange={(open) =>
+                      setPendingDelete(open ? profile.id : null)
                     }
+                    title={`Delete ${profile.name}?`}
+                    description="This permanently removes the profile and its shortlist. This cannot be undone."
+                    pending={deleteProfile.isPending}
+                    onConfirm={() => {
+                      deleteProfile.mutate(
+                        { path: { profile_id: profile.id } },
+                        { onSettled: () => setPendingDelete(null) },
+                      )
+                    }}
                   >
-                    Delete
-                  </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      className="ml-auto text-[var(--error)] hover:bg-[color-mix(in_oklab,var(--error)_10%,transparent)] hover:text-[var(--error)]"
+                      disabled={deleteProfile.isPending}
+                      aria-label={`Delete ${profile.name}`}
+                    >
+                      <Trash2 aria-hidden />
+                    </Button>
+                  </ConfirmDialog>
                 </div>
               </article>
             )
-          })
-        )}
-      </div>
+          })}
+        </div>
+      )}
     </main>
   )
 }

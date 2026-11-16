@@ -1,4 +1,11 @@
 import { useState } from 'react'
+import {
+  CircleAlert,
+  GraduationCap,
+  Languages,
+  UserRound,
+  Wrench,
+} from 'lucide-react'
 
 import { useAppForm } from '#/hooks/career.form'
 import { toFormErrors } from '#/lib/api-errors'
@@ -25,6 +32,36 @@ const EMPTY_OPTIONS: TaxonomyOptions = {
   countries: [],
   skills: [],
   tracks: [],
+}
+
+function FormSection({
+  icon: Icon,
+  title,
+  children,
+  disabled,
+}: {
+  icon: typeof UserRound
+  title: string
+  children: React.ReactNode
+  disabled?: boolean
+}) {
+  return (
+    <fieldset className="space-y-5" disabled={disabled}>
+      <legend className="sr-only">{title}</legend>
+      <div className="flex items-center gap-2.5 border-b border-[var(--divider)] pb-3">
+        <span
+          aria-hidden
+          className="inline-flex size-8 items-center justify-center rounded-lg bg-[var(--primary-tint)] text-[var(--primary)]"
+        >
+          <Icon className="size-4" />
+        </span>
+        <h2 className="m-0 text-sm font-semibold tracking-tight text-[var(--ink)]">
+          {title}
+        </h2>
+      </div>
+      {children}
+    </fieldset>
+  )
 }
 
 export function CareerProfileForm({
@@ -80,7 +117,7 @@ export function CareerProfileForm({
 
   if (taxonomyQuery.isError) {
     return (
-      <p className="text-sm font-semibold text-red-600">
+      <p className="text-sm font-semibold text-[var(--error)]">
         Failed to load the skills/country taxonomy — is the backend running on
         port 8000?
       </p>
@@ -89,19 +126,20 @@ export function CareerProfileForm({
 
   return (
     <section className="panel-card mx-auto w-full max-w-3xl p-6 sm:p-8">
-      <div className="mb-6">
+      <div className="mb-8">
         <p className="tier-eyebrow mb-2">{eyebrow}</p>
-        <h1 className="display-title m-0 text-2xl font-semibold tracking-tight text-[var(--ink)]">
-          {title}
-        </h1>
-        <p className="mt-2 text-sm text-[var(--ink-secondary)]">{subtitle}</p>
+        <h1 className="display-title m-0 text-2xl tracking-tight">{title}</h1>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--ink-secondary)]">
+          {subtitle}
+        </p>
       </div>
 
       {submitError && (
         <div
           role="alert"
-          className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
+          className="mb-6 flex gap-2.5 rounded-lg border border-[color-mix(in_oklab,var(--error)_35%,transparent)] bg-[color-mix(in_oklab,var(--error)_8%,transparent)] px-4 py-3 text-sm font-medium text-[var(--error)]"
         >
+          <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
           {submitError}
         </div>
       )}
@@ -112,12 +150,13 @@ export function CareerProfileForm({
           e.stopPropagation()
           form.handleSubmit()
         }}
-        className="space-y-7"
+        className="space-y-9"
       >
-        <fieldset className="space-y-5" disabled={taxonomyQuery.isPending}>
-          <legend className="mb-1 text-xs font-bold uppercase tracking-wider text-[var(--ink-secondary)]">
-            About you
-          </legend>
+        <FormSection
+          icon={UserRound}
+          title="About you"
+          disabled={taxonomyQuery.isPending}
+        >
           <div className="grid gap-5 sm:grid-cols-2">
             <form.AppField name="name">
               {(field) => (
@@ -151,12 +190,13 @@ export function CareerProfileForm({
               />
             )}
           </form.AppField>
-        </fieldset>
+        </FormSection>
 
-        <fieldset className="space-y-5" disabled={taxonomyQuery.isPending}>
-          <legend className="mb-1 text-xs font-bold uppercase tracking-wider text-[var(--ink-secondary)]">
-            Education &amp; experience
-          </legend>
+        <FormSection
+          icon={GraduationCap}
+          title="Education & experience"
+          disabled={taxonomyQuery.isPending}
+        >
           <div className="grid gap-5 sm:grid-cols-2">
             <form.AppField name="education_level">
               {(field) => (
@@ -195,12 +235,13 @@ export function CareerProfileForm({
               />
             )}
           </form.AppField>
-        </fieldset>
+        </FormSection>
 
-        <fieldset className="space-y-5" disabled={taxonomyQuery.isPending}>
-          <legend className="mb-1 text-xs font-bold uppercase tracking-wider text-[var(--ink-secondary)]">
-            Skills &amp; interests
-          </legend>
+        <FormSection
+          icon={Wrench}
+          title="Skills & interests"
+          disabled={taxonomyQuery.isPending}
+        >
           <form.AppField name="skills">
             {(field) => (
               <field.ChipsField
@@ -220,12 +261,13 @@ export function CareerProfileForm({
               />
             )}
           </form.AppField>
-        </fieldset>
+        </FormSection>
 
-        <fieldset className="space-y-5" disabled={taxonomyQuery.isPending}>
-          <legend className="mb-1 text-xs font-bold uppercase tracking-wider text-[var(--ink-secondary)]">
-            Languages &amp; locations
-          </legend>
+        <FormSection
+          icon={Languages}
+          title="Languages & locations"
+          disabled={taxonomyQuery.isPending}
+        >
           <form.AppField name="languages">
             {(field) => (
               <field.LanguageRowsField
@@ -254,9 +296,9 @@ export function CareerProfileForm({
               />
             )}
           </form.AppField>
-        </fieldset>
+        </FormSection>
 
-        <div className="flex justify-end border-t border-[var(--divider)] pt-5">
+        <div className="flex justify-end border-t border-[var(--divider)] pt-6">
           <form.AppForm>
             <form.SubscribeButton label={submitLabel} />
           </form.AppForm>
