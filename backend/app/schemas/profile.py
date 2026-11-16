@@ -173,12 +173,12 @@ class ProfileCreate(CareerProfileBase):
     name: str = Field(
         min_length=1,
         max_length=NAME_MAX_LENGTH,
-        examples=["Nusrat Jahan"],
+        examples=["Alex Rahman"],
         description="Display name (1-100 characters, trimmed).",
     )
     email: EmailStr = Field(
         max_length=EMAIL_MAX_LENGTH,
-        examples=["nusrat@example.com"],
+        examples=["alex.rahman@example.com"],
         description="Contact email — stored lowercase, unique per profile.",
     )
 

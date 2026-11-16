@@ -5,9 +5,9 @@ Two entry points:
 
 - `parse_raw_candidate` / helpers — rule-based parsing of prose like
   "2 years in business operations and project support" or
-  "Bengali (native), English (professional)". Used by the demo-profile
-  seeding and covered by unit tests; the API itself receives the hybrid
-  form's structured fields and normalizes those instead.
+  "Bengali (native), English (professional)". Covered by unit tests;
+  the API itself receives the hybrid form's structured fields and
+  normalizes those instead.
 - `normalize_profile` / `normalize_opportunity` — map already-structured
   input onto the canonical taxonomy (skills aliases, country aliases,
   field aliases, language level aliases). Everything downstream — vectors,

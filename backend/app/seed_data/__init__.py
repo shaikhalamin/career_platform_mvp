@@ -1,1 +1,1 @@
-"""Seed data package: fictional opportunities and demo candidate payloads."""
+"""Seed data package: fictional opportunities (reference data only)."""

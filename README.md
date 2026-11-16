@@ -88,7 +88,7 @@ cp .env.example .env
 uv run alembic upgrade head     # apply migrations
 uv run uvicorn app.main:app --reload --port 8000
                                 # → http://127.0.0.1:8000 (auto-reload)
-                                # → seeds 50 opportunities + demo profiles on startup
+                                # → seeds 50 opportunities on startup
 
 # 3. Frontend: install and run (new terminal)
 cd ../frontend

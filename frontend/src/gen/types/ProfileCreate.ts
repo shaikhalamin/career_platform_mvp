@@ -93,7 +93,7 @@ export type ProfileCreate = {
    * @description Display name (1-100 characters, trimmed).
    * @minLength 1
    * @maxLength 100
-   * @example Nusrat Jahan
+   * @example Alex Rahman
    * @type string
    */
   name: string;
@@ -102,7 +102,7 @@ export type ProfileCreate = {
    *
    * Format: `email`
    * @maxLength 320
-   * @example nusrat@example.com
+   * @example alex.rahman@example.com
    * @type string
    */
   email: string;

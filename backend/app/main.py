@@ -33,7 +33,8 @@ async def lifespan(app: FastAPI):
     )
     if not settings.is_testing:
         # Tests seed their own fixtures (no lifespan under ASGITransport);
-        # dev/prod boot with the 50 opportunities + demo profiles ready.
+        # dev/prod boot with the 50 opportunities ready. User profiles are
+        # never seeded — only API-created profiles exist.
         try:
             async with AsyncSessionLocal() as session:
                 await ensure_seeded(session)

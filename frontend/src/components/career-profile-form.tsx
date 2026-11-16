@@ -166,14 +166,14 @@ export function CareerProfileForm({
           <div className="grid gap-5 sm:grid-cols-2">
             <form.AppField name="name">
               {(field) => (
-                <field.TextField label="Full name" placeholder="Nusrat Jahan" />
+                <field.TextField label="Full name" placeholder="Your full name" />
               )}
             </form.AppField>
             <form.AppField name="email">
               {(field) => (
                 <field.TextField
                   label="Email"
-                  placeholder="nusrat@example.com"
+                  placeholder="you@example.com"
                   hint="Used as your profile handle — no signup or password."
                 />
               )}

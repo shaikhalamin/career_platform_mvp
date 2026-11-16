@@ -121,8 +121,9 @@ uv run uvicorn app.main:app --reload --port 8000
 
 - Swagger UI: http://127.0.0.1:8000/docs
 - Health check: `GET /api/v1/health`
-- On startup the app seeds **50 opportunities + demo profiles**
-  (`app/services/seed_service.py`) so the frontend is usable immediately.
+- On startup the app seeds **50 opportunities**
+  (`app/services/seed_service.py`); user profiles are never seeded —
+  they only appear once created through the app.
 
 ## API (mounted under `/api/v1`)
 

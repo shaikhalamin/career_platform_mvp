@@ -1,7 +1,7 @@
 """Fictional seed opportunities (50) with varied requirements.
 
-Curated for the demo candidate profile (bachelor's in business, 2 years in
-business operations/project support, Excel/research/stakeholder
+Curated around a reference candidate profile (bachelor's in business, 2
+years in business operations/project support, Excel/research/stakeholder
 communication/reporting/project coordination, Bengali native + English
 professional, prefers Germany/Canada/Singapore, work authorisation unknown):
 
@@ -76,7 +76,7 @@ def job(
 
 
 OPPORTUNITIES: list[dict[str, Any]] = [
-    # --- Strong matches for the demo business-operations candidate --------
+    # --- Strong matches for the reference business-operations candidate ----
     job(
         "J001",
         "Programme Support Officer",
@@ -976,47 +976,3 @@ OPPORTUNITIES: list[dict[str, Any]] = [
 
 assert len(OPPORTUNITIES) == 50, f"expected 50 seed opportunities, got {len(OPPORTUNITIES)}"
 assert len({j["id"] for j in OPPORTUNITIES}) == 50, "seed opportunity ids must be unique"
-
-#: Demo profiles created from raw free-text payloads — proving the
-#: normalization engine end to end. The first is the assessment's sample
-#: candidate, verbatim.
-RAW_DEMO_CANDIDATES: list[dict[str, Any]] = [
-    {
-        "name": "Nusrat Jahan",
-        "email": "nusrat.jahan@example.com",
-        "raw": {
-            "education": "Bachelor's degree in Business Administration",
-            "experience": "2 years in business operations and project support",
-            "skills": "Excel, research, stakeholder communication, reporting, project coordination",
-            "languages": "Bengali (native), English (professional)",
-            "preferred_locations": "Germany, Canada, Singapore",
-            "career_interests": "Programme support, business operations, project coordination",
-            "work_authorisation": {
-                "Germany": "unknown",
-                "Canada": "unknown",
-                "Singapore": "unknown",
-            },
-            "citizenship": None,
-            "currently_enrolled": None,
-        },
-    },
-    {
-        "name": "Daniel Weber",
-        "email": "daniel.weber@example.com",
-        "raw": {
-            "education": "Master's degree in Data Science",
-            "experience": "4 years in data analysis and business intelligence",
-            "skills": "Python, SQL, Tableau, data analysis, data visualization, reporting",
-            "languages": "German (native), English (fluent)",
-            "preferred_locations": "Germany, United States, Netherlands",
-            "career_interests": "Data analytics, business intelligence",
-            "work_authorisation": {
-                "Germany": "authorized",
-                "United States": "unknown",
-                "Netherlands": "authorized",
-            },
-            "citizenship": "Germany",
-            "currently_enrolled": False,
-        },
-    },
-]

@@ -17,8 +17,8 @@ export const profileCreateSchema = z.object({
   work_authorisation: z.pipe(z.unknown().check(z.refine(value => typeof value !== "object" || value === null || Array.isArray(value) || Object.keys(value).length <= 20, { message: "Object must have at most 20 properties" })), z.record(z.string(), z.enum(['authorized', 'not_authorized', 'unknown']))).optional().describe('Stated work-authorisation status per country. \'unknown\' is a first-class value and always surfaces as \'requires verification\'.').meta({ examples: [{"Canada":"unknown","Germany":"unknown"}] }),
   citizenship: z.union([z.string().max(80), z.null().nullable()]).optional().describe('Country of citizenship (null = not stated; drives verification flags).').meta({ examples: ['Bangladesh'] }),
   currently_enrolled: z.union([z.boolean(), z.null().nullable()]).optional().describe('Whether currently enrolled in study (null = not stated).').meta({ examples: [true] }),
-  name: z.string().min(1).max(100).describe('Display name (1-100 characters, trimmed).').meta({ examples: ['Nusrat Jahan'] }),
-  email: z.email().max(320).describe('Contact email — stored lowercase, unique per profile.').meta({ examples: ['nusrat@example.com'] }),
+  name: z.string().min(1).max(100).describe('Display name (1-100 characters, trimmed).').meta({ examples: ['Alex Rahman'] }),
+  email: z.email().max(320).describe('Contact email — stored lowercase, unique per profile.').meta({ examples: ['alex.rahman@example.com'] }),
 }).describe('Body for `POST /profiles` — identity plus the full career profile.')
 
 export type ProfileCreateSchemaType = z.infer<typeof profileCreateSchema>
