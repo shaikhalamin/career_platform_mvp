@@ -1,7 +1,7 @@
 """FastAPI application factory.
 
 Run in development:
-    make dev             (uvicorn app.main:app --reload)
+    uv run uvicorn app.main:app --reload --port 8000
 Run in production:
     uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
 """
@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI):
                 await ensure_seeded(session)
                 await session.commit()
         except Exception:
-            logger.exception("Seeding failed — run `make migrate` and restart.")
+            logger.exception("Seeding failed — run `uv run alembic upgrade head` and restart.")
     yield
     logger.info("Shutting down — closing database connections")
     await engine.dispose()

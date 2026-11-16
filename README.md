@@ -67,14 +67,15 @@ Node.js 20+ with npm.
 ```bash
 # 1. Backend: start PostgreSQL (host port 5435) and install deps
 cd backend
-make db-up          # docker compose up -d (Postgres 17)
-uv sync             # creates .venv from uv.lock
+docker compose up -d            # Postgres 17
+uv sync                         # creates .venv from uv.lock
 
 # 2. Backend: configure, migrate, run
 cp .env.example .env
-make migrate        # alembic upgrade head
-make dev            # uvicorn on http://127.0.0.1:8000 (auto-reload)
-                    # → seeds 50 opportunities + demo profiles on startup
+uv run alembic upgrade head     # apply migrations
+uv run uvicorn app.main:app --reload --port 8000
+                                # → http://127.0.0.1:8000 (auto-reload)
+                                # → seeds 50 opportunities + demo profiles on startup
 
 # 3. Frontend: install and run (new terminal)
 cd ../frontend
@@ -95,7 +96,6 @@ career_platform_mvp/
 │   ├── app/          # main.py, api/v1, core, models, schemas, services, seed_data
 │   ├── alembic/      # DB migrations
 │   ├── tests/        # pytest (unit + API tests, throwaway test DB)
-│   ├── Makefile      # db-up / dev / migrate / test / lint / fmt
 │   └── docker-compose.yml
 └── frontend/         # TanStack Start web app
     ├── src/routes/   # file-based routes (home, profiles, opportunities, …)

@@ -8,7 +8,8 @@ import { pluginReactQuery } from '@kubb/plugin-react-query'
 /**
  * API client generation from the backend's live OpenAPI document.
  *
- * Requires the backend running on :8000 (`cd backend && make dev`):
+ * Requires the backend running on :8000
+ * (`cd backend && uv run uvicorn app.main:app --reload --port 8000`):
  *     npm run gen:api
  *
  * `baseURL` is the origin only — FastAPI mounts everything under /api/v1, so

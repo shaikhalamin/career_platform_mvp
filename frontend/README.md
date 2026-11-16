@@ -90,7 +90,7 @@ committed, so regeneration is only needed when the backend API changes.
 
 ```bash
 # terminal 1 — backend running on :8000
-cd ../backend && make dev
+cd ../backend && uv run uvicorn app.main:app --reload --port 8000
 
 # terminal 2 — regenerate src/gen from the live OpenAPI document
 cd ../frontend

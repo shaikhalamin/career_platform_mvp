@@ -72,7 +72,7 @@ Prerequisites: Docker, [uv](https://docs.astral.sh/uv/) (Python 3.13).
 cd backend
 
 # 1. Start PostgreSQL (host port 5435)
-make db-up
+docker compose up -d
 
 # 2. Install dependencies (creates .venv from uv.lock)
 uv sync
@@ -81,10 +81,10 @@ uv sync
 cp .env.example .env
 
 # 4. Apply migrations
-make migrate
+uv run alembic upgrade head
 
 # 5. Run the dev server (auto-reload)
-make dev
+uv run uvicorn app.main:app --reload --port 8000
 ```
 
 - Swagger UI: http://127.0.0.1:8000/docs
@@ -159,7 +159,7 @@ tests/                    # pytest + pytest-asyncio; run against a throwaway tes
 ## Testing & linting
 
 ```bash
-make test    # pytest — uses the dedicated career_platform_mvp_test database
-make lint    # ruff check
-make fmt     # ruff format
+uv run pytest            # tests — uses the dedicated career_platform_mvp_test database
+uv run ruff check .      # lint
+uv run ruff format .     # format
 ```
