@@ -11,15 +11,20 @@ async def test_taxonomy_countries_with_regions_and_aliases(client):
     assert body["success"] is True
     countries = {c["name"]: c for c in body["data"]["countries"]}
 
-    # Bangladesh is selectable as a preferred/work-auth country.
+    # The full valid-country list (195 sovereign states + Taiwan).
+    assert len(countries) == 196
     assert countries["Bangladesh"]["region"] == "Asia-Pacific"
+    assert countries["Australia"]["region"] == "Oceania"
+    assert countries["Bolivia"]["region"] == "South America"
+    assert countries["United Kingdom"]["region"] == "Europe"
 
     # Aliases mirror the backend's accepted input spellings.
     assert sorted(countries["United States"]["aliases"]) == sorted(
         ["usa", "us", "u.s.", "u.s.a.", "united states of america", "america"]
     )
-    assert countries["Bangladesh"]["aliases"] == []
-    assert countries["United Kingdom"]["region"] == "Europe"
+    # ISO alpha-2/alpha-3 codes are exposed as aliases for every country.
+    assert countries["Bangladesh"]["aliases"] == ["bd", "bgd"]
+    assert countries["Türkiye"]["aliases"] == ["tr", "tur", "turkey"]
 
 
 async def test_taxonomy_countries_match_profile_validation(client):

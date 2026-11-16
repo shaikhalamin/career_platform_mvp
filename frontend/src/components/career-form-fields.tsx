@@ -7,6 +7,8 @@ import { useFieldContext, useFormContext } from '#/hooks/form-contexts'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import { Label } from '#/components/ui/label'
+import { SearchableSelect } from '#/components/ui/searchable-select'
+import type { SearchableSelectOption } from '#/components/ui/searchable-select'
 import * as ShadcnSelect from '#/components/ui/select'
 import { Slider as ShadcnSlider } from '#/components/ui/slider'
 import { Switch as ShadcnSwitch } from '#/components/ui/switch'
@@ -166,6 +168,43 @@ export function SelectField({
           </ShadcnSelect.SelectGroup>
         </ShadcnSelect.SelectContent>
       </ShadcnSelect.Select>
+      {hint && <FieldHint hint={hint} />}
+      <FieldErrors />
+    </div>
+  )
+}
+
+export function SearchableSelectField({
+  label,
+  options,
+  placeholder = 'Select…',
+  searchPlaceholder = 'Search…',
+  clearLabel,
+  hint,
+}: {
+  label: string
+  options: SearchableSelectOption[]
+  placeholder?: string
+  searchPlaceholder?: string
+  clearLabel?: string
+  hint?: string
+}) {
+  const field = useFieldContext<string>()
+  return (
+    <div>
+      <Label className="mb-2 block text-sm font-medium text-[var(--ink)]">
+        {label}
+      </Label>
+      <SearchableSelect
+        id={label}
+        value={field.state.value}
+        onValueChange={(value) => field.handleChange(value)}
+        options={options}
+        placeholder={placeholder}
+        searchPlaceholder={searchPlaceholder}
+        clearLabel={clearLabel}
+        disabled={options.length === 0}
+      />
       {hint && <FieldHint hint={hint} />}
       <FieldErrors />
     </div>
@@ -365,6 +404,80 @@ export function ChipsField({
   )
 }
 
+/**
+ * Preferred countries: the full taxonomy list is too long to scan, so
+ * countries are added through a searchable picker and shown as removable
+ * chips. Only taxonomy entries can be added — no free text, no 422s.
+ */
+export function CountryChipsField({
+  label,
+  options,
+  searchPlaceholder = 'Search countries by name or code…',
+  hint,
+}: {
+  label: string
+  options: SearchableSelectOption[]
+  searchPlaceholder?: string
+  hint?: string
+}) {
+  const field = useFieldContext<string[]>()
+  const [draft, setDraft] = useState('')
+  const selected = new Set(field.state.value)
+
+  const addCountry = (country: string) => {
+    if (country && !selected.has(country)) {
+      field.handleChange([...field.state.value, country])
+    }
+    setDraft('')
+  }
+
+  return (
+    <div>
+      <Label className="mb-2 block text-sm font-medium text-[var(--ink)]">
+        {label}
+      </Label>
+      <SearchableSelect
+        value={draft}
+        onValueChange={addCountry}
+        options={options.map((option) => ({
+          ...option,
+          disabled: selected.has(option.value),
+        }))}
+        placeholder="Search countries…"
+        searchPlaceholder={searchPlaceholder}
+        emptyMessage="No country matches that search."
+        disabled={options.length === 0}
+      />
+      {hint && <FieldHint hint={hint} />}
+      {field.state.value.length > 0 && (
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
+          {field.state.value.map((chip) => (
+            <span
+              key={chip}
+              className="inline-flex items-center gap-1 rounded-full border border-[var(--divider)] bg-[var(--primary-tint)] py-1 pr-1 pl-2.5 text-xs font-medium text-[var(--primary-strong)]"
+            >
+              {chip}
+              <button
+                type="button"
+                aria-label={`Remove ${chip}`}
+                className="-mr-0.5 inline-flex size-5 items-center justify-center rounded-full text-[var(--primary-strong)] transition hover:bg-[color-mix(in_oklab,var(--status-danger)_12%,transparent)] hover:text-[var(--status-danger)]"
+                onClick={() =>
+                  field.handleChange(
+                    field.state.value.filter((existing) => existing !== chip),
+                  )
+                }
+              >
+                <X aria-hidden className="size-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+      <FieldErrors />
+    </div>
+  )
+}
+
 export interface LanguageRow {
   name: string
   level: string
@@ -478,7 +591,7 @@ export function WorkAuthRowsField({
   hint,
 }: {
   label: string
-  countries: string[]
+  countries: SearchableSelectOption[]
   hint?: string
 }) {
   const field = useFieldContext<WorkAuthRow[]>()
@@ -499,27 +612,20 @@ export function WorkAuthRowsField({
       <div className="space-y-2">
         {rows.map((row, index) => (
           <div key={index} className="flex items-center gap-2">
-            <ShadcnSelect.Select
+            <SearchableSelect
               value={row.country}
               onValueChange={(value) => update(index, { country: value })}
-            >
-              <ShadcnSelect.SelectTrigger size="sm" className="w-full min-w-32">
-                <ShadcnSelect.SelectValue placeholder="Country" />
-              </ShadcnSelect.SelectTrigger>
-              <ShadcnSelect.SelectContent className="bg-background text-foreground">
-                {countries.map((country) => (
-                  <ShadcnSelect.SelectItem
-                    key={country}
-                    value={country}
-                    disabled={
-                      usedCountries.has(country) && country !== row.country
-                    }
-                  >
-                    {country}
-                  </ShadcnSelect.SelectItem>
-                ))}
-              </ShadcnSelect.SelectContent>
-            </ShadcnSelect.Select>
+              options={countries.map((option) => ({
+                ...option,
+                disabled:
+                  usedCountries.has(option.value) &&
+                  option.value !== row.country,
+              }))}
+              placeholder="Country"
+              searchPlaceholder="Search countries by name or code…"
+              size="sm"
+              className="w-full min-w-32"
+            />
             <ShadcnSelect.Select
               value={row.status}
               onValueChange={(value) => update(index, { status: value })}
@@ -561,7 +667,8 @@ export function WorkAuthRowsField({
             ...rows,
             {
               country:
-                countries.find((c) => !usedCountries.has(c)) ?? countries[0],
+                countries.find((c) => !usedCountries.has(c.value))?.value ??
+                (countries.length > 0 ? countries[0].value : ''),
               status: 'unknown',
             },
           ])

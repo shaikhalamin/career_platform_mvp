@@ -2,7 +2,9 @@ import { createFormHook } from '@tanstack/react-form'
 
 import {
   ChipsField,
+  CountryChipsField,
   LanguageRowsField,
+  SearchableSelectField,
   SelectField,
   SliderField,
   SubscribeButton,
@@ -17,8 +19,10 @@ export const { useAppForm } = createFormHook({
   fieldComponents: {
     TextField,
     SelectField,
+    SearchableSelectField,
     SliderField,
     ChipsField,
+    CountryChipsField,
     LanguageRowsField,
     WorkAuthRowsField,
     TriStateSwitchField,

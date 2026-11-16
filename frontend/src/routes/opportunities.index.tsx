@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import {
   Briefcase,
@@ -15,6 +15,7 @@ import { Button } from '#/components/ui/button'
 import { PageHeader } from '#/components/page-header'
 import { EmptyState } from '#/components/empty-state'
 import { CardGridSkeleton } from '#/components/skeletons'
+import { SearchableSelect } from '#/components/ui/searchable-select'
 import { useActiveProfile } from '#/lib/active-profile'
 import { ShortlistButton } from '#/components/shortlist-button'
 import { useListOpportunitiesApiV1OpportunitiesGet } from '#/gen/queries/opportunities/useListOpportunitiesApiV1OpportunitiesGet'
@@ -67,8 +68,16 @@ function OpportunitiesPage() {
   const [search, setSearch] = useState('')
 
   const taxonomyQuery = useGetTaxonomyApiV1MetaTaxonomyGet()
-  const countries =
-    taxonomyQuery.data?.data?.countries.map((entry) => entry.name) ?? []
+  const countryOptions = useMemo(
+    () =>
+      taxonomyQuery.data?.data?.countries.map((entry) => ({
+        label: entry.name,
+        value: entry.name,
+        hint: entry.region,
+        keywords: [entry.name.toLowerCase(), ...(entry.aliases ?? [])],
+      })) ?? [],
+    [taxonomyQuery.data],
+  )
 
   const listQuery = useListOpportunitiesApiV1OpportunitiesGet({
     query: {
@@ -125,23 +134,20 @@ function OpportunitiesPage() {
             />
           </span>
         </label>
-        <label className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5">
           <span className="text-xs font-medium text-[var(--ink-secondary)]">
             Country
           </span>
-          <select
+          <SearchableSelect
             value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            className={filterSelectClass}
-          >
-            <option value="">All countries</option>
-            {countries.map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
-          </select>
-        </label>
+            onValueChange={setCountry}
+            options={countryOptions}
+            placeholder="All countries"
+            searchPlaceholder="Search countries by name or code…"
+            clearLabel="All countries"
+            emptyMessage="No country matches that search."
+          />
+        </div>
         <label className="flex flex-col gap-1.5">
           <span className="text-xs font-medium text-[var(--ink-secondary)]">
             Type

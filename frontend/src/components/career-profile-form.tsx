@@ -20,8 +20,9 @@ import { useGetTaxonomyApiV1MetaTaxonomyGet } from '#/gen/queries/meta/useGetTax
 
 /**
  * The hybrid career-profile form (create + edit share it): dropdowns for
- * degree/language proficiencies/work authorisation, free-text chips for
- * skills, interests, areas and preferred countries. Validated with zod
+ * degree/language proficiencies, a searchable picker over the full country
+ * taxonomy for citizenship, preferred countries and work authorisation,
+ * plus free-text chips for skills, interests and areas. Validated with zod
  * locally; the backend re-validates and canonicalizes.
  */
 
@@ -30,6 +31,7 @@ const EMPTY_OPTIONS: TaxonomyOptions = {
   languageLevels: [],
   languages: [],
   countries: [],
+  countryOptions: [],
   countryInputs: new Set<string>(),
   skills: [],
   tracks: [],
@@ -187,9 +189,12 @@ export function CareerProfileForm({
           </form.AppField>
           <form.AppField name="citizenship">
             {(field) => (
-              <field.TextField
+              <field.SearchableSelectField
                 label="Citizenship (optional)"
-                placeholder="e.g. Bangladesh"
+                options={options.countryOptions}
+                placeholder="Select a country…"
+                searchPlaceholder="Search countries by name or code…"
+                clearLabel="Not stated"
                 hint="Used only for citizenship-restricted roles. Blank means 'not stated' — never assumed."
               />
             )}
@@ -283,11 +288,10 @@ export function CareerProfileForm({
           </form.AppField>
           <form.AppField name="preferred_locations">
             {(field) => (
-              <field.ChipsField
+              <field.CountryChipsField
                 label="Preferred countries"
-                placeholder="e.g. Germany"
-                hint="Roles in the same region as a preference also earn partial location credit."
-                suggestions={options.countries}
+                options={options.countryOptions}
+                hint="All 196 valid countries are searchable by name or ISO code (e.g. BD, USA). Roles in the same region as a preference also earn partial location credit."
               />
             )}
           </form.AppField>
@@ -295,7 +299,7 @@ export function CareerProfileForm({
             {(field) => (
               <field.WorkAuthRowsField
                 label="Work authorisation by country (optional)"
-                countries={options.countries}
+                countries={options.countryOptions}
                 hint="'Unknown' is a valid answer — the platform will flag those roles as requiring verification instead of assuming anything."
               />
             )}

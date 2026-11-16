@@ -94,7 +94,7 @@ export function makeCareerFormSchema(
         ctx.addIssue({
           code: 'custom',
           path: ['preferred_locations'],
-          message: `"${country}" is not a supported country — pick one from the suggestions or use a known alias (e.g. UK, USA).`,
+          message: `"${country}" is not a supported country — search for it by name or code (e.g. UK, USA, BD).`,
         })
       }
     }
@@ -180,6 +180,13 @@ export interface TaxonomyOptions {
   languageLevels: { label: string; value: string }[]
   languages: string[]
   countries: string[]
+  /** Combobox entries for the full country list (searchable by name/alias). */
+  countryOptions: {
+    label: string
+    value: string
+    hint: string
+    keywords: string[]
+  }[]
   /** Lowercased names + aliases the backend resolves (validation set). */
   countryInputs: ReadonlySet<string>
   skills: string[]
@@ -188,11 +195,19 @@ export interface TaxonomyOptions {
 
 export function taxonomyToOptions(taxonomy: TaxonomyRead): TaxonomyOptions {
   const countryInputs = new Set<string>()
+  const countryOptions: TaxonomyOptions['countryOptions'] = []
   for (const country of taxonomy.countries) {
+    const aliases = (country.aliases ?? []).map((alias) => alias.toLowerCase())
     countryInputs.add(country.name.toLowerCase())
-    for (const alias of country.aliases ?? []) {
-      countryInputs.add(alias.toLowerCase())
+    for (const alias of aliases) {
+      countryInputs.add(alias)
     }
+    countryOptions.push({
+      label: country.name,
+      value: country.name,
+      hint: country.region,
+      keywords: [country.name.toLowerCase(), ...aliases],
+    })
   }
   return {
     degreeLevels: taxonomy.degree_levels.map((level) => ({
@@ -204,6 +219,7 @@ export function taxonomyToOptions(taxonomy: TaxonomyRead): TaxonomyOptions {
       .map((level) => ({ value: level.value, label: level.label })),
     languages: taxonomy.languages,
     countries: taxonomy.countries.map((country) => country.name),
+    countryOptions,
     countryInputs,
     skills: taxonomy.skills,
     tracks: taxonomy.career_tracks,
