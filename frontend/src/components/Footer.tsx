@@ -80,7 +80,9 @@ export default function Footer() {
           </nav>
         </div>
         <div className="mt-8 flex flex-col items-start justify-between gap-2 border-t border-[var(--footer-divider)] pt-5 text-xs sm:flex-row">
-          <p className="m-0">
+          {/* suppressHydrationWarning: the year can differ between the
+              server render and client hydration around New Year. */}
+          <p className="m-0" suppressHydrationWarning>
             &copy; {year} PathPilot — career mobility prototype. All
             organisations and opportunities are fictional.
           </p>

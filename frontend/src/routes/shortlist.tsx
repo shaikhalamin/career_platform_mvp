@@ -100,7 +100,13 @@ function ShortlistList({ profileId }: { profileId: number }) {
                         aria-hidden
                         className="size-3 text-[var(--ink-tertiary)]"
                       />
-                      saved {new Date(item.created_at).toLocaleDateString()}
+                      saved{' '}
+                      {new Date(item.created_at).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                        timeZone: 'UTC',
+                      })}
                     </span>
                   </div>
                   {item.note && (
